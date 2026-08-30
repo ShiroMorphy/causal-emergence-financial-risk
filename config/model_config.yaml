@@ -1,0 +1,40 @@
+# Model Hyperparameters and Optimization Configuration for CEFI & NIS+
+
+linear_var:
+  regularization: "ledoit_wolf"   # Options: "none", "ridge", "ledoit_wolf"
+  ridge_alpha: 1e-4
+  sigma_do: 1.0
+
+stiefel_optimization:
+  optimizer: "RiemannianTrustRegions" # Options: "RiemannianTrustRegions", "RiemannianConjugateGradient"
+  max_iterations: 300
+  tol_gradient: 1e-6
+  n_restarts: 5
+  use_pca_init: true
+
+dynamic_pipeline:
+  primary_window: 500       # ~2 trading years
+  robustness_windows: [250, 750, 1000]
+  step_size: 1              # Daily rolling frequency
+  n_jobs: -1                # Parallelize across all available CPU cores
+
+neural_nis:
+  latent_dims: [2, 3, 4, 5, 8, 10]
+  hidden_dim: 64
+  num_layers: 2
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  lambda_pred: 1.0
+  lambda_recon: 0.5
+  lambda_ei: 1.0
+  epochs: 150
+  batch_size: 64
+
+econometrics:
+  forecast_horizons: [5, 20, 60]  # Business days
+  bootstrap:
+    method: "stationary"          # Politis & Romano (1994)
+    n_bootstraps: 1000
+    mean_block_length: 20
+  newey_west_lags: "auto"         # 2 * horizon
+  oos_split_date: "2001-01-01"

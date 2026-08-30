@@ -1,0 +1,33 @@
+# Data Acquisition and Pipeline Configuration for Paper 1
+dataset_primary:
+  name: "Fama-French 30 Industry Portfolios"
+  source: "ken_french"
+  dataset_id: "30_Industry_Portfolios_daily"
+  start_date: "1990-01-01"
+  end_date: "2026-03-31"
+
+dataset_robustness:
+  etfs:
+    name: "11 SPDR Sector ETFs"
+    tickers: ["XLE", "XLF", "XLK", "XLI", "XLU", "XLP", "XLY", "XLV", "XLB", "XLRE", "XLC"]
+    start_date: "1998-12-22"
+    end_date: "2026-03-31"
+  sp100:
+    name: "S&P 100 Constituents"
+    source: "yahoo"
+    start_date: "2000-01-01"
+    end_date: "2026-03-31"
+
+macro_controls:
+  vix: "^VIX"
+  fred_series:
+    st_louis_fsi: "STLFSI4"
+    kansas_city_fsi: "KCFSI"
+    treasury_spread_10y3m: "T10Y3M"
+    corporate_spread_baa_aaa: "BAA10Y"
+    ted_spread: "TEDRATE"
+
+preprocessing:
+  winsorize: true
+  winsorize_limits: [0.001, 0.001]
+  imputation: "ffill_bfill"
