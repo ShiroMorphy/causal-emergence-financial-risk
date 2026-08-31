@@ -50,8 +50,8 @@ def run_single_window_ce(
     q_candidates: Optional[List[int]] = None,
     kappa_do: float = 1.0,
     null_bias_dict: Optional[Dict[int, float]] = None,
-    n_restarts: int = 3,
-    max_iter: int = 35
+    n_restarts: int = 12,
+    max_iter: int = 100
 ) -> Dict:
     """
     Computes scale-invariant Effective Information (micro and macro) and CEFI for a single time slice.
@@ -106,14 +106,16 @@ def run_single_window_ce(
 def compute_dynamic_cefi_series(
     returns_df: Any,
     window_length: int = 500,
-    step_size: int = 1,
+    step_size: int = 2,
     q_candidates: Optional[List[int]] = None,
     kappa_do: float = 1.0,
+    n_restarts: int = 12,
+    max_iter: int = 100,
     n_jobs: int = -1
 ) -> Any:
     """
     Generates historical daily time series of CEFI_t, Excess CEFI_t, and q_t^* across rolling windows.
-    Evaluates complete dimensional grid q in 1 .. p-1.
+    Evaluates complete dimensional grid q in 1 .. p-1 with 12 restarts / 100 iterations.
     """
     import pandas as pd
     from joblib import Parallel, delayed
@@ -138,7 +140,7 @@ def compute_dynamic_cefi_series(
         tasks.append(window_slice)
         task_dates.append(date_t)
 
-    print(f"Executing {len(tasks)} rolling windows in parallel (n_jobs={n_jobs}, {len(q_candidates)} dimensions q={q_candidates[0]}..{q_candidates[-1]})...")
+    print(f"Executing {len(tasks)} rolling windows in parallel (n_jobs={n_jobs}, restarts={n_restarts}, iters={max_iter}, q={q_candidates[0]}..{q_candidates[-1]})...")
 
     def _process_slice(window_slice, date_t):
         res = run_single_window_ce(
@@ -146,8 +148,8 @@ def compute_dynamic_cefi_series(
             q_candidates=q_candidates,
             kappa_do=kappa_do,
             null_bias_dict=null_bias_dict,
-            n_restarts=2,
-            max_iter=30
+            n_restarts=n_restarts,
+            max_iter=max_iter
         )
         row = {
             "date": date_t,

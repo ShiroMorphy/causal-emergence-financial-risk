@@ -1,0 +1,7 @@
+{
+  "n_restarts": 12,
+  "max_iter": 100,
+  "eta": 0.05,
+  "reference_calibration": "25/150",
+  "selection_reason": "Optimizer budget calibration"
+}

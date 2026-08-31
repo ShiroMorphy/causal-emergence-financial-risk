@@ -17,8 +17,8 @@ try:
         q: int,
         Sigma_x_np: Optional[np.ndarray] = None,
         kappa_do: float = 1.0,
-        n_restarts: int = 3,
-        max_iter: int = 40,
+        n_restarts: int = 12,
+        max_iter: int = 100,
         lr: float = 0.05
     ) -> Tuple[np.ndarray, float]:
         p = A_np.shape[0]
@@ -173,8 +173,8 @@ def optimize_coarse_graining_stiefel(
     q: int,
     Sigma_x: Optional[np.ndarray] = None,
     kappa_do: float = 1.0,
-    n_restarts: int = 3,
-    max_iter: int = 40,
+    n_restarts: int = 12,
+    max_iter: int = 100,
     lr: float = 0.05
 ) -> Tuple[np.ndarray, float]:
     """
