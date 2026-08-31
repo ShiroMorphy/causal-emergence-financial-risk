@@ -1,0 +1,12 @@
+Metric,Value
+Audited Historical Windows (N),25
+Evaluation Objective,J(q*) = EI_q/q - EI_p/p
+Default Budget,"4 restarts, 35 iterations"
+High-Budget Reference,"25 restarts, 150 iterations"
+Median Relative Objective Gap,20.484%
+95th Percentile Relative Gap,45.029%
+Maximum Relative Gap,48.412%
+Exact q* Agreement,48.0% (12/25)
+q* Agreement within +/- 1,84.0% (21/25)
+Pearson Correlation (CEFI),0.8913
+Spearman Correlation (CEFI),0.8062

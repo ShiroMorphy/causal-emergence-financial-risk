@@ -1,0 +1,10 @@
+Category,SourceFile,Description
+Primary Null Inference,reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS.csv,"B=9,999 matched null distributions for Calm, GFC, and COVID under strict 4/35 budget."
+Full Null Summary,reports/tables/full_null_inference_summary.csv,All 4 null models across the 3 benchmark regimes.
+Episode Dimensions,reports/tables/table_episode_level_summary.csv,Modal dimension and P(q*<=4) distributions for Liquidity vs Valuation stress.
+Event Study HAC Robustness,reports/tables/table_hac_bandwidth_sensitivity.csv,Delta Beta=+0.691 across Newey-West bandwidths L=20..250.
+Leave-One-Out Sensitivity,reports/tables/table_leave_one_out_sensitivity.csv,Sequential crisis exclusion with full HAC contrast covariance (all Wald t >= 3.10).
+Literature Benchmarking,reports/tables/table_disaggregated_benchmarking.csv,"Concordance with Liu et al. (2024, 2025) across 870 historical slices."
+Optimizer Audit,reports/final_submission_source_of_truth/optimizer_audit_canonical.csv,Convergence audit on selection objective J(q*) across 25 historical windows (Pearson rho=0.8913).
+References Audit,reports/final_submission_source_of_truth/canonical_references.csv,100% verified academic citations with Crossref/publisher DOIs.
+Figures Manifest,reports/final_submission_source_of_truth/canonical_figures_manifest.csv,Figure 1-4 synchronization with canonical CSV values.

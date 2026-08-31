@@ -1,0 +1,569 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{natbib}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\onehalfspacing
+
+\title{\textbf{Supplementary Appendix} \\ \Large Causal Emergence in Financial Markets: Dynamic Organization and Effective Dimensionality During Systemic Stress}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Scale-Invariance Numerical Test and Formal Derivation}
+\label{app:scale_invariance}
+
+A central property of the empirical estimator developed in this paper is exact invariance to common/global scalar rescaling of asset return units ($X \to c X$ for $c > 0$). This ensures that whether returns are expressed in decimals, percentages, or basis points, the information-theoretic quantities $\mathrm{CEFI}_t$ and $q_t^*$ remain numerically identical.
+
+\subsection{Mathematical Derivation of Scale Invariance}
+Consider the transition dynamics $\mathbf{x}_{t+1} = \mathbf{A}\mathbf{x}_t + \boldsymbol{\varepsilon}_{t+1}$ with $\boldsymbol{\varepsilon}_{t+1} \sim \mathcal{N}(\mathbf{0}, \boldsymbol{\Sigma}_\varepsilon)$ and unconditional state covariance $\boldsymbol{\Sigma}_x = \operatorname{Cov}(\mathbf{x}_t)$. Under a global scalar change of return units $\tilde{\mathbf{x}}_t = c \mathbf{x}_t$ ($c > 0$):
+\begin{enumerate}
+    \item \textbf{State Covariance:} $\tilde{\boldsymbol{\Sigma}}_x = \operatorname{Cov}(c \mathbf{x}_t) = c^2 \boldsymbol{\Sigma}_x$.
+    \item \textbf{Transition Matrix Estimator:} Under the trace-scaled ridge estimator,
+    \begin{equation}
+    \tilde{\lambda}_t = \lambda_0 \cdot \frac{\operatorname{Tr}(\tilde{\mathbf{X}}_{\text{lag}}^\top \tilde{\mathbf{X}}_{\text{lag}})}{p} = c^2 \lambda_t
+    \end{equation}
+    Consequently,
+    \begin{equation}
+    \hat{\tilde{\mathbf{A}}} = \tilde{\mathbf{X}}_{\text{lead}}^\top \tilde{\mathbf{X}}_{\text{lag}} \left( \tilde{\mathbf{X}}_{\text{lag}}^\top \tilde{\mathbf{X}}_{\text{lag}} + \tilde{\lambda}_t \mathbf{I}_p \right)^{-1} = c^2 \mathbf{X}_{\text{lead}}^\top \mathbf{X}_{\text{lag}} \left( c^2 \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lag}} + c^2 \lambda_t \mathbf{I}_p \right)^{-1} = \hat{\mathbf{A}}
+    \end{equation}
+    Thus, $\hat{\mathbf{A}}$ is strictly scale-invariant.
+    \item \textbf{Innovation Covariance:} Residuals transform as $\tilde{\boldsymbol{\varepsilon}}_t = c \boldsymbol{\varepsilon}_t$, so under Ledoit-Wolf analytical shrinkage, $\tilde{\boldsymbol{\Sigma}}_\varepsilon = c^2 \boldsymbol{\Sigma}_\varepsilon$.
+    \item \textbf{Intervention Scale:} The energy-scaled variance is:
+    \begin{equation}
+    \tilde{\sigma}_{do,t}^2 = \kappa^2 \cdot \frac{\operatorname{Tr}(\tilde{\boldsymbol{\Sigma}}_{x,t})}{p} = c^2 \sigma_{do,t}^2
+    \end{equation}
+    \item \textbf{Effective Information:} Substituting these expressions into the continuous $EI$ formula yields:
+    \begin{align}
+    \widetilde{EI}(\mathbf{x}) &= \frac{1}{2} \ln \det \left( \mathbf{I}_p + \tilde{\sigma}_{do,t}^2 \hat{\tilde{\mathbf{A}}}\hat{\tilde{\mathbf{A}}}^\top \tilde{\boldsymbol{\Sigma}}_\varepsilon^{-1} \right) \nonumber \\
+    &= \frac{1}{2} \ln \det \left( \mathbf{I}_p + (c^2 \sigma_{do,t}^2) \hat{\mathbf{A}}\hat{\mathbf{A}}^\top (c^2 \boldsymbol{\Sigma}_\varepsilon)^{-1} \right) \nonumber \\
+    &= \frac{1}{2} \ln \det \left( \mathbf{I}_p + \sigma_{do,t}^2 \hat{\mathbf{A}}\hat{\mathbf{A}}^\top \boldsymbol{\Sigma}_\varepsilon^{-1} \right) = EI(\mathbf{x})
+    \end{align}
+\end{enumerate}
+Identical algebraic cancellations hold for any projected macro-system $EI_q(\mathbf{W})$, guaranteeing that $\mathrm{CEFI}_t$ and $q_t^*$ are strictly scale-invariant.
+
+\paragraph{Scope Delimitation.} Invariance is claimed exclusively for common scalar multipliers ($X \to c X$). Invariance is not claimed for arbitrary asset-specific diagonal scalings ($X \to X D$).
+
+\begin{table}[htbp]
+\centering
+\caption{Numerical Verification of Global Return Scale Invariance Across Four Orders of Magnitude}
+\label{tab:app_scale_inv}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Scale Multiplier ($c$)} & $\mathbf{EI_{\text{micro}}}$ & $\mathbf{EI_{\text{macro}}^*}$ & $\mathbf{CEFI}$ & $\mathbf{q^*}$ & $|\Delta \mathbf{CEFI}|$ \\
+\midrule
+$c = 0.01$ (Basis points / 100) & 0.11381190 & 0.02644265 & -0.00022650 & 7 & $0.00$ \\
+$c = 1.00$ (Standard return units) & 0.11381190 & 0.02644265 & -0.00022650 & 7 & $< 10^{-14}$ \\
+$c = 100.0$ (Percentage points)   & 0.11381190 & 0.02644265 & -0.00022650 & 7 & $< 10^{-14}$ \\
+$c = 10000.0$ (Basis points)      & 0.11381190 & 0.02644265 & -0.00022650 & 7 & $< 10^{-14}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{VAR Transition Matrix Orientation: Mathematical Derivation and Synthetic Test}
+\label{app:var_orientation}
+
+Let $\mathbf{x}_t \in \mathbb{R}^p$ denote a column vector of asset returns at date $t$. The theoretical first-order Vector Autoregression is defined as:
+\begin{equation}
+\mathbf{x}_{t+1} = \mathbf{A}\mathbf{x}_t + \boldsymbol{\varepsilon}_{t+1}, \qquad \boldsymbol{\varepsilon}_{t+1} \sim \mathcal{N}(\mathbf{0}, \boldsymbol{\Sigma}_\varepsilon)
+\end{equation}
+where $\mathbf{A} \in \mathbb{R}^{p \times p}$ maps state $\mathbf{x}_t$ to the conditional expectation $\mathbb{E}[\mathbf{x}_{t+1} \mid \mathbf{x}_t] = \mathbf{A}\mathbf{x}_t$.
+
+In matrix data arrangements, observations are organized into matrices $\mathbf{X}_{\text{lag}} \in \mathbb{R}^{(T-1) \times p}$ and $\mathbf{X}_{\text{lead}} \in \mathbb{R}^{(T-1) \times p}$, where row $t$ contains $\mathbf{x}_t^\top$ and $\mathbf{x}_{t+1}^\top$, respectively. Transposing the model equation yields the row-regression representation:
+\begin{equation}
+\mathbf{x}_{t+1}^\top = \mathbf{x}_t^\top \mathbf{A}^\top + \boldsymbol{\varepsilon}_{t+1}^\top \implies \mathbf{X}_{\text{lead}} = \mathbf{X}_{\text{lag}} \mathbf{B} + \mathbf{E}, \quad \mathbf{B} = \mathbf{A}^\top
+\end{equation}
+The least-squares / ridge solution for $\mathbf{B}$ is:
+\begin{equation}
+\hat{\mathbf{B}} = \left( \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lag}} + \lambda_t \mathbf{I}_p \right)^{-1} \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lead}} = \hat{\mathbf{A}}^\top
+\end{equation}
+Taking the transpose recovers the column transition matrix:
+\begin{equation}
+\hat{\mathbf{A}} = \hat{\mathbf{B}}^\top = \mathbf{X}_{\text{lead}}^\top \mathbf{X}_{\text{lag}} \left( \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lag}} + \lambda_t \mathbf{I}_p \right)^{-1}
+\end{equation}
+
+\subsection{Synthetic Non-Symmetric Recovery Audit}
+To verify that the implementation receives $\mathbf{A}$ and not $\mathbf{A}^\top$, we generated $T=10,000$ synthetic observations from a strongly non-symmetric transition matrix $\mathbf{A}_{\text{true}}$ ($\|\mathbf{A}_{\text{true}} - \mathbf{A}_{\text{true}}^\top\|_F = 0.738$, spectral radius $\rho = 0.528$). Fitting via our estimator yields:
+\begin{equation}
+\|\hat{\mathbf{A}} - \mathbf{A}_{\text{true}}\|_F = 0.061089, \qquad \|\hat{\mathbf{A}}^\top - \mathbf{A}_{\text{true}}\|_F = 1.589664
+\end{equation}
+The direct estimation error is over 26 times smaller than the transposed error, confirming that the estimator delivers the exact column-model transition matrix $\mathbf{A}$.
+
+\section{Macro-Dynamics: Interventional Lifting and Observational Closure Diagnostic}
+\label{app:macro_closure}
+
+Let $\mathbf{W} \in \mathbb{R}^{q \times p}$ denote an orthogonal coarse-graining matrix residing on the row-Stiefel manifold $\mathcal{V}_q(\mathbb{R}^p) = \{ \mathbf{W} \in \mathbb{R}^{q \times p} : \mathbf{W}\mathbf{W}^\top = \mathbf{I}_q \}$. The macroscopic state is defined as $\mathbf{y}_t = \mathbf{W}\mathbf{x}_t$.
+
+\subsection{Interventional Channel Construction via Canonical Lifting}
+Following the causal emergence framework of \citet{liu2024exact}, an intervention on the macro-state $do(\mathbf{y}_t)$ is lifted to the micro-state via the right pseudo-inverse $do(\mathbf{x}_t) = \mathbf{W}^\dagger do(\mathbf{y}_t)$. Because $\mathbf{W}\mathbf{W}^\top = \mathbf{I}_q$, the right inverse is $\mathbf{W}^\dagger = \mathbf{W}^\top (\mathbf{W}\mathbf{W}^\top)^{-1} = \mathbf{W}^\top$.
+
+Under the interventional lifting $do(\mathbf{x}_t) = \mathbf{W}^\top \mathbf{y}_t$, the micro-state evolves as:
+\begin{equation}
+\mathbf{x}_{t+1} \mid do(\mathbf{y}_t) = \mathbf{A} \mathbf{W}^\top \mathbf{y}_t + \boldsymbol{\varepsilon}_{t+1}
+\end{equation}
+Projecting the resulting state back into the macro-subspace via $\mathbf{W}$ defines the \emph{constructed macro interventional channel}:
+\begin{equation}
+\mathbf{y}_{t+1} = \mathbf{W}\mathbf{x}_{t+1} = (\mathbf{W}\mathbf{A}\mathbf{W}^\top)\mathbf{y}_t + \mathbf{W}\boldsymbol{\varepsilon}_{t+1} = \mathbf{A}_M \mathbf{y}_t + \boldsymbol{\varepsilon}_{M,t+1}
+\end{equation}
+where $\mathbf{A}_M = \mathbf{W}\mathbf{A}\mathbf{W}^\top$ and $\boldsymbol{\Sigma}_M = \mathbf{W}\boldsymbol{\Sigma}_\varepsilon \mathbf{W}^\top$.
+
+\subsection{Observational Projection and Closure Error Diagnostic}
+Under passive observational dynamics, the true projected process is:
+\begin{equation}
+\mathbf{y}_{t+1} = \mathbf{W}\mathbf{x}_{t+1} = \mathbf{W}\mathbf{A}\mathbf{x}_t + \mathbf{W}\boldsymbol{\varepsilon}_{t+1} = \mathbf{W}\mathbf{A}\mathbf{W}^\top \mathbf{y}_t + \mathbf{W}\mathbf{A}(\mathbf{I}_p - \mathbf{W}^\top \mathbf{W})\mathbf{x}_t + \mathbf{W}\boldsymbol{\varepsilon}_{t+1}
+\end{equation}
+The middle term represents omitted micro-state dynamics orthogonal to the macro-subspace. We define the relative observational closure error diagnostic as:
+\begin{equation}
+r_{\text{closure},t} = \frac{\|\mathbf{W}\mathbf{A} - \mathbf{W}\mathbf{A}\mathbf{W}^\top \mathbf{W}\|_F}{\|\mathbf{W}\mathbf{A}\|_F}
+\end{equation}
+
+\begin{table}[htbp]
+\centering
+\caption{Observational Closure Error Diagnostic Across Historical Benchmark Regimes ($q=2$)}
+\label{tab:app_closure}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Regime} & $\mathbf{r_{\text{closure}}}$ & \textbf{Micro } $\mathbf{p}$ & \textbf{Macro } $\mathbf{q}$ & \textbf{Interpretation} \\
+\midrule
+2005 Calm Market Benchmark & 0.9756 & 30 & 2 & Constructed Interventional Channel \\
+2008 GFC Peak (Nov 2008)   & 0.7814 & 30 & 2 & Constructed Interventional Channel \\
+2020 COVID Crash (Mar 2020) & 0.8003 & 30 & 2 & Constructed Interventional Channel \\
+2000 Dot-Com Crash         & 0.8922 & 30 & 2 & Constructed Interventional Channel \\
+2022 Rate Tightening       & 0.9161 & 30 & 2 & Constructed Interventional Channel \\
+\midrule
+\multicolumn{5}{l}{Stratified Historical Sample of Rolling Windows (435 windows): Mean $= 0.7946$, Median $= 0.7965$, $Q_{95} = 0.9927$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Because $r_{\text{closure}}$ is non-zero (averaging $\approx 0.795$), the macro model $\mathbf{A}_M = \mathbf{W}\mathbf{A}\mathbf{W}^\top$ is formally interpreted as a \emph{constructed macro interventional transition operator} under the canonical lifting $\mathbf{W}^\top$, rather than an autonomous closed observational projection.
+
+\section{Optimizer Budget Sensitivity Diagnostic}
+\label{app:stiefel_opt}
+
+\subsection{Riemannian Gradient and Canonical Metric Duality on Row-Stiefel}
+The row-Stiefel manifold is defined as $\mathcal{V}_q(\mathbb{R}^p) = \{ \mathbf{W} \in \mathbb{R}^{q \times p} : \mathbf{W}\mathbf{W}^\top = \mathbf{I}_q \}$. The canonical metric on $T_{\mathbf{W}}\mathcal{V}_q(\mathbb{R}^p)$ is defined by \citet{edelman1998geometry} and \citet{absil2008optimization}:
+\begin{equation}
+g_{\mathbf{W}}^{\text{canonical}}(\mathbf{\Delta}_1, \mathbf{\Delta}_2) = \operatorname{Tr}\left( \mathbf{\Delta}_1 \left(\mathbf{I}_p - \frac{1}{2}\mathbf{W}^\top \mathbf{W}\right) \mathbf{\Delta}_2^\top \right)
+\end{equation}
+Under this metric, the Riemannian gradient of a differentiable scalar function $f(\mathbf{W})$ with Euclidean gradient $\mathbf{G} = \nabla_{\mathbf{W}} f(\mathbf{W})$ is:
+\begin{equation}
+\operatorname{grad}_{\mathcal{R}} f(\mathbf{W}) = \mathbf{G} - \mathbf{W}\mathbf{G}^\top \mathbf{W}
+\end{equation}
+
+\paragraph{Theorem (Canonical Metric Inner Product Duality).}
+For any tangent vector $\mathbf{\Delta} \in T_{\mathbf{W}}\mathcal{V}_q(\mathbb{R}^p)$ (which satisfies $\mathbf{W}\mathbf{\Delta}^\top + \mathbf{\Delta}\mathbf{W}^\top = \mathbf{0}$):
+\begin{equation}
+g_{\mathbf{W}}^{\text{canonical}}(\operatorname{grad}_{\mathcal{R}} f(\mathbf{W}), \mathbf{\Delta}) = \operatorname{Tr}(\mathbf{G}\mathbf{\Delta}^\top) = \langle \mathbf{G}, \mathbf{\Delta} \rangle_{\text{Euclidean}} = D f(\mathbf{W})[\mathbf{\Delta}]
+\end{equation}
+
+\subsection{Optimizer Budget Sensitivity and Calibration Diagnostic}
+We evaluated 25 evenly spaced historical estimation windows comparing alternative computational budgets against a high-budget reference configuration (150 iterations, 25 multistarts). The objective gap is evaluated on the true dimension-selection criterion $J(q^*) = \frac{EI_{q^*}}{q^*} - \frac{EI_p}{p}$.
+
+\begin{table}[htbp]
+\centering
+\caption{Optimizer Budget Calibration Diagnostic on Selection Objective $J(q^*)$: Candidate Configurations vs. High-Budget Reference (25/150)}
+\label{tab:app_optimizer_convergence}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Configuration} & \textbf{Restarts} & \textbf{Iter} & \textbf{Cost Mult.} & \textbf{Median Gap (\%)} & \textbf{Q95 Gap (\%)} & \textbf{Pearson } $\mathbf{\rho}$ & \textbf{Exact } $\mathbf{q^*}$ & $\mathbf{q^* \pm 1}$ \\
+\midrule
+4/35 (Default)   & 4  & 35  & 1.00$\times$  & 25.08\% & 40.74\% & 0.8452 & 52.0\% & 88.0\% \\
+8/75             & 8  & 75  & 2.90$\times$  & 5.31\%  & 16.84\% & 0.9533 & 72.0\% & 84.0\% \\
+12/100           & 12 & 100 & 5.90$\times$  & 1.82\%  & 11.70\% & 0.9732 & 92.0\% & 100.0\% \\
+16/100           & 16 & 100 & 7.84$\times$  & 1.20\%  & 8.39\%  & 0.9756 & 88.0\% & 92.0\% \\
+25/150 (Ref)     & 25 & 150 & 18.02$\times$ & 0.00\%  & 0.00\%  & 1.0000 & 100.0\% & 100.0\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The multi-budget calibration demonstrates systematic convergence towards the high-budget reference. At 12 multistarts and 100 iterations, the median objective gap drops to 1.82\%, with 92.0\% exact dimensional recovery and 100.0\% agreement within $\pm 1$ dimension (Pearson $\rho = 0.9732$, Spearman $\rho_S = 0.9377$). Because observed and surrogate null series are evaluated under identical optimizer budgets, Monte Carlo hypothesis tests remain strictly symmetric.
+
+\section{VAR Stability and Spectral Radius Diagnostics}
+\label{app:spectral_radius}
+
+We evaluate the spectral radius $\rho_t = \max_j |\lambda_j(\mathbf{A}_t)|$ across all 4,346 rolling windows (1992--2026). The empirical distribution yields:
+\begin{itemize}
+    \item Mean $\rho_t = 0.3207$, Median $\rho_t = 0.3078$, $Q_{95} = 0.4227$, Maximum $\rho_t = 0.6777$.
+    \item Zero rolling windows exhibit $\rho_t \ge 1.0$, confirming that all estimated VAR(1) transition operators are strictly stationary.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Spectral Radius of VAR(1) Transition Matrix Across Historical Stress Episodes}
+\label{tab:app_spectral_radius}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Historical Episode} & \textbf{Mean } $\mathbf{\rho_t}$ & \textbf{Median } $\mathbf{\rho_t}$ & \textbf{Max } $\mathbf{\rho_t}$ & \textbf{Stationary (\%)} \\
+\midrule
+2005 Calm Market Benchmark  & 0.2948 & 0.2910 & 0.3340 & 100\% \\
+2008 GFC Peak               & 0.3159 & 0.3120 & 0.4120 & 100\% \\
+2020 COVID Shock            & 0.4222 & 0.4180 & 0.5890 & 100\% \\
+2000 Dot-Com Crash          & 0.3024 & 0.2990 & 0.3610 & 100\% \\
+2022 Rate Tightening        & 0.3015 & 0.2980 & 0.3580 & 100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{VAR Dynamic Specification and Lag Adequacy Diagnostics}
+\label{app:var_lag_order}
+
+The empirical design adopts a first-order Vector Autoregression as the deliberate specification for capturing one-step intertemporal transfer capacity between consecutive trading days. Residual diagnostic tests on the estimated innovation vector $\boldsymbol{\varepsilon}_t = \mathbf{x}_t - \hat{\mathbf{A}}\mathbf{x}_{t-1}$ show:
+\begin{itemize}
+    \item \textbf{Autocorrelation:} Mean lag-1 residual autocorrelation across assets is near zero in calm markets ($\bar{r}_1 = +0.0064$), GFC ($\bar{r}_1 = -0.0454$), and COVID ($\bar{r}_1 = +0.0097$).
+    \item \textbf{Volatility Clustering:} As expected in daily financial returns, innovations exhibit ARCH effects and fat tails (mean excess kurtosis ranging from $+0.74$ in 2005 to $+6.64$ in March 2020).
+\end{itemize}
+
+\section{Full Matched Null Hierarchy Simulation Protocol and Results}
+\label{app:null_protocol}
+
+\begin{table}[htbp]
+\centering
+\caption{Complete Matched Null Model Inference Table ($B=9,999$ for Primary Nulls; $B=999$ for Auxiliary Nulls)}
+\label{tab:app_full_nulls}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{Regime} & \textbf{Null Model} & $\mathbf{B}$ & $\mathbf{CEFI_{\text{obs}}}$ & $\mathbb{E}[\mathbf{CEFI_0}]$ & $\mathbf{Q_{95}}$ & $\mathbf{z_{\text{dev}}}$ & $\mathbf{p_{\text{emp}}}$ & $\mathbf{p_{\text{Holm}}}$ \\
+\midrule
+\textbf{Calm Period (2005)} 
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 0.9848 & +0.0280 & +0.0616 & +45.98 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 0.9848 & +0.0123 & +0.0171 & +350.34 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 0.9848 & +0.8587 & +1.1494 & +0.85 & 0.1940 & 0.3880 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 0.9848 & +1.0255 & +1.2228 & -0.35 & 0.6215 & 0.6215 \\
+\midrule
+\textbf{2008 GFC Peak} 
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 1.8948 & +0.0618 & +0.1622 & +35.35 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.8948 & +0.0583 & +0.1152 & +53.92 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.8948 & +1.3712 & +1.6857 & +3.16 & 0.0014 & 0.0042 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.8948 & +1.4832 & +1.6437 & +4.57 & 0.0001 & 0.0006 \\
+\midrule
+\textbf{2020 COVID Shock} 
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 1.8787 & +0.0334 & +0.1058 & +50.47 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.8787 & +0.0015 & +0.0035 & +966.78 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.8787 & +1.3154 & +1.5831 & +2.95 & 0.0001 & 0.0006 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.8787 & +1.3977 & +1.5197 & +6.22 & 0.0001 & 0.0006 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Multiple-Testing Adjustments and Sensitivity Analysis}
+\label{app:multiple_testing}
+
+We define the \textbf{Primary Hypothesis Family} as the six central regime-null combinations:
+\begin{equation}
+\mathcal{F}_{\text{primary}} = \{ (\text{Calm}, H_0^{\text{static}}), (\text{Calm}, H_0^{\text{diag+contemp}}), (\text{GFC}, H_0^{\text{static}}), (\text{GFC}, H_0^{\text{diag+contemp}}), (\text{COVID}, H_0^{\text{static}}), (\text{COVID}, H_0^{\text{diag+contemp}}) \}
+\end{equation}
+Under the Holm-Bonferroni step-down procedure ($m=6$), individual nominal test rejections are evaluated alongside family-wise multiplicity-adjusted $p$-values.
+
+\section{Causal Effective Dimension ($q^*$) vs. Static Covariance Dimensionality}
+\label{app:q_vs_static_rank}
+
+To evaluate whether $q^*$ merely mirrors static covariance concentration (Effective Rank or PCA dimension), we evaluated their relationship across all 4,346 rolling windows:
+\begin{itemize}
+    \item Spearman correlation between $q^*$ and Effective Rank: $\rho_S = +0.1959$.
+    \item Pearson correlation between $q^*$ and Effective Rank: $\rho = +0.2262$.
+    \item Spearman correlation between $q^*$ and 80\% PCA variance dimension: $\rho_S = +0.1434$.
+    \item Spearman correlation between $q^*$ and 90\% PCA variance dimension: $\rho_S = +0.1413$.
+    \item Episode-level concentration: systemic liquidity crises exhibit modal $q^* = 2$ with 80.8\% of observations satisfying $q^* \le 4$, compared with modal $q^* = 4$ and only 48.9\% of observations satisfying $q^* \le 4$ during valuation repricing episodes.
+    \item Cross-method dimensional concordance: analytical SVD emergence achieves 88.7\% agreement within $\pm 1$ dimension.
+\end{itemize}
+These low rank correlations indicate that $q^*$ is only weakly monotonically associated with static covariance dimensionality.
+
+\section{Conventional Systemic Risk Benchmarks: Collinearity and Residualized CEFI}
+\label{app:collinearity_and_residuals}
+
+\subsection{Multicollinearity Diagnostics}
+Variance Inflation Factors (VIF) and condition number for the multivariate regression of $\mathrm{CEFI}_t$ on conventional proxies ($RV_t, \bar{\rho}_t, ER_t, DY_t$):
+\begin{itemize}
+    \item $\text{VIF}(RV) = 3.20$, $\text{VIF}(\bar{\rho}) = 27.30$, $\text{VIF}(ER) = 13.77$, $\text{VIF}(DY) = 15.11$.
+    \item Condition number of the normalized design matrix: $\kappa(\mathbf{X}) = 11.80$.
+\end{itemize}
+Because average correlation, effective rank, and connectedness exhibit substantial multicollinearity ($\text{VIF} > 13$), individual partial regression coefficients should not be interpreted as isolated economic channels. The complete linear specification accounts for 67.77\% of linear variation ($R^2 = 67.77\%$, leaving 32.23\% unexplained by this linear combination).
+
+\subsection{Residualized CEFI Analysis}
+We construct residualized $\mathrm{CEFI}$:
+\begin{equation}
+\mathrm{CEFI}_{\text{res},t} = \mathrm{CEFI}_t - \hat{\mathbb{E}}[\mathrm{CEFI}_t \mid RV_t, \bar{\rho}_t, ER_t, DY_t]
+\end{equation}
+Evaluating $\mathrm{CEFI}_{\text{res},t}$ across episodes:
+\begin{itemize}
+    \item \textbf{2008 GFC Peak:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0394$ (Median $= +0.0428$).
+    \item \textbf{2020 COVID Shock:} Mean $\mathrm{CEFI}_{\text{res}} = +0.2765$ (Median $= +0.3306$).
+    \item \textbf{2000 Dot-Com Crash:} Mean $\mathrm{CEFI}_{\text{res}} = -0.0589$ (Median $= -0.0875$).
+    \item \textbf{2022 Rate Tightening:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0393$ (Median $= +0.0072$).
+\end{itemize}
+Residualized $\mathrm{CEFI}_t$ retains episode-level variation after linear adjustment for conventional proxies.
+
+\section{Event Study Regressions: Full HAC Lag Bandwidth Sensitivity}
+\label{app:hac_bandwidth}
+
+\begin{table}[htbp]
+\centering
+\caption{Sensitivity of Event Study Estimates Across Extended Newey-West Lag Bandwidths ($L=20$ to $L=250$)}
+\label{tab:app_hac_sensitivity}
+\begin{tabular}{cccccccc}
+\toprule
+\textbf{HAC Lag ($L$)} & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\beta_{\text{Val}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\Delta \beta}$ & \textbf{Wald } $\mathbf{t\text{-stat}}$ & \textbf{Wald } $\mathbf{p\text{-val}}$ \\
+\midrule
+$L = 20$  & +0.336 & +5.50 & -0.355 & -6.30 & +0.691 & +8.31 & $1.11 \times 10^{-16}$ \\
+$L = 40$  & +0.336 & +4.54 & -0.355 & -4.82 & +0.691 & +7.11 & $1.16 \times 10^{-12}$ \\
+$L = 60$  & +0.336 & +4.07 & -0.355 & -4.15 & +0.691 & +6.24 & $4.38 \times 10^{-10}$ \\
+$L = 120$ & +0.336 & +3.64 & -0.355 & -3.28 & +0.691 & +5.20 & $1.99 \times 10^{-07}$ \\
+$L = 250$ & +0.336 & +4.04 & -0.355 & -2.89 & +0.691 & +4.98 & $6.36 \times 10^{-07}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Leave-One-Episode-Out Crisis Sensitivity Analysis}
+\label{app:leave_one_out}
+
+To verify whether the historical contrast between liquidity crises and valuation repricing ($\Delta \beta = \beta_{\text{Liq}} - \beta_{\text{Val}} > 0$) is driven by a single outlier episode, we re-estimated the specification excluding each historical episode sequentially, computing the exact contrast Wald test using the full HAC covariance matrix.
+
+\begin{table}[htbp]
+\centering
+\caption{Leave-One-Episode-Out Event Study Robustness with Full HAC Contrast Covariance}
+\label{tab:app_leave_one_out}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Excluded Episode} & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{\beta_{\text{Val}}}$ & $\mathbf{\Delta \beta}$ & \textbf{Exact Wald } $\mathbf{t\text{-stat}}$ & \textbf{Exact Wald } $\mathbf{p\text{-val}}$ \\
+\midrule
+None (Full Sample)        & +0.336 & -0.355 & +0.691 & +7.11 & $1.16 \times 10^{-12}$ \\
+Exclude Dot-Com Crash     & +0.338 & +0.000 & +0.338 & +3.10 & $1.91 \times 10^{-03}$ \\
+Exclude 2008 GFC          & +0.514 & -0.355 & +0.869 & +5.69 & $1.28 \times 10^{-08}$ \\
+Exclude 2020 COVID Shock  & +0.302 & -0.355 & +0.657 & +6.68 & $2.47 \times 10^{-11}$ \\
+Exclude 2022 Rate Tightening & +0.457 & -0.355 & +0.812 & +10.20 & $1.97 \times 10^{-24}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In all cases, $\Delta \beta$ remains strictly positive and statistically significant (Wald $t \ge 3.10$). The contrast remains positive and statistically significant after omitting each episode individually.
+
+\section{Sensitivity to Intervention Scale Parameter \texorpdfstring{$\kappa$}{kappa}}
+\label{app:kappa_sensitivity}
+
+\begin{table}[htbp]
+\centering
+\caption{Robustness of Causal Emergence Across Dimensionless Intervention Scales $\kappa \in [0.25, 4.0]$}
+\label{tab:app_kappa}
+\begin{tabular}{cccccc}
+\toprule
+$\mathbf{\kappa}$ & \textbf{Mean } $\mathbf{CEFI}$ & \textbf{Spearman } $\mathbf{\rho_S}$ vs Baseline & \textbf{Modal } $\mathbf{q^*}$ & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{t\text{-stat}}$ \\
+\midrule
+0.25 & 0.1245 & 0.718 & 2 & +0.084 & +2.92 \\
+0.50 & 0.4320 & 0.894 & 2 & +0.210 & +3.88 \\
+1.00 & 0.9423 & 1.000 & 3 & +0.336 & +4.54 \\
+2.00 & 1.6210 & 0.932 & 3 & +0.485 & +4.92 \\
+4.00 & 2.4501 & 0.841 & 3 & +0.612 & +5.11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sensitivity to Rolling Window Length \texorpdfstring{$W$}{W}}
+\label{app:window_length}
+
+\begin{table}[htbp]
+\centering
+\caption{Robustness Across Rolling Estimation Window Lengths ($W \in \{500, 750, 1000\}$ Trading Days)}
+\label{tab:app_window}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Window Length ($W$)} & \textbf{Mean } $\mathbf{CEFI}$ & \textbf{Spearman } $\mathbf{\rho_S}$ vs Baseline & \textbf{Optimal Phase Lag ($\ell$)} & \textbf{Lagged Corr} \\
+\midrule
+$W = 500$ days (Baseline) & 0.9423 & 1.000 & 0 & 1.000 \\
+$W = 750$ days            & 0.8812 & 0.726 & -45 days & 0.792 \\
+$W = 1000$ days           & 0.8140 & 0.593 & -90 days & 0.683 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Cross-Universe Robustness: Fama-French 49 Industry Cross-Section}
+\label{app:ff49}
+
+Replication on the 49 Fama-French Industry Portfolios ($p=49$) across all $q \in \{1, \dots, 48\}$:
+\begin{itemize}
+    \item Sample period: 1990--2026 ($T = 9,190$ trading days, 4,346 rolling windows).
+    \item Mean $\mathrm{CEFI}_{FF49} = 1.0585$, Median $q^* = 3$, Modal $q^* = 3$.
+    \item 71.72\% of historical trading days exhibit $q^* \le 4$.
+    \item Matched null inference during the March 2020 COVID shock: $\mathrm{CEFI}_{\text{obs}} = 1.6350 \ge Q_{95}(H_0^{\text{static}}) = 1.6243$. In finite-sample surrogate testing with $B=100$, exactly 5 surrogate realizations equal or exceed the observed value ($k=5$), yielding an empirical $p$-value of $p_{\text{emp}} = \frac{1 + 5}{100 + 1} = 0.0594$; the finite-sample test therefore does not reject at the 5\% significance level, serving as an exploratory cross-universe check.
+\end{itemize}
+
+\section{Computational Environment and Software Manifest}
+\label{app:comp_env}
+
+All estimations were performed in the following software environment:
+\begin{itemize}
+    \item \textbf{Operating System:} macOS (Darwin 24.3.0, Apple Silicon ARM64).
+    \item \textbf{Python Version:} 3.11.0.
+    \item \textbf{Key Packages:} PyTorch 2.3.1, NumPy 2.0.2, SciPy 1.17.1, scikit-learn 1.8.0, pandas 2.3.3, statsmodels 0.14.6, joblib 1.4.2, matplotlib 3.9.0.
+    \item \textbf{Hardware Concurrency:} 11 CPU cores, process-based parallel multi-processing.
+    \item \textbf{Global Seeds:} Fixed default random seed $= 42$.
+\end{itemize}
+
+\begin{thebibliography}{28}
+\bibitem[Absil et~al., 2008]{absil2008optimization}
+Absil, P.-A., Mahony, R., Sepulchre, R., 2008.
+\newblock Optimization Algorithms on Matrix Manifolds.
+\newblock Princeton University Press, Princeton, NJ. \url{https://doi.org/10.1515/9781400830244}
+
+\bibitem[Acharya et~al., 2017]{acharya2017measuring}
+Acharya, V. V., Pedersen, L. H., Philippon, T., Richardson, M., 2017.
+\newblock Measuring Systemic Risk.
+\newblock \emph{Review of Financial Studies} 30(1), 2--47. \url{https://doi.org/10.1093/rfs/hhw088}
+
+\bibitem[Adrian et~al., 2016]{adrian2016covar}
+Adrian, T., Brunnermeier, M. K., 2016.
+\newblock CoVaR.
+\newblock \emph{American Economic Review} 106(7), 1705--1741. \url{https://doi.org/10.1257/aer.20120555}
+
+\bibitem[Ahelegbey et~al., 2022]{ahelegbey2022network}
+Ahelegbey, D. F., Cerchiello, P., Scaramozzino, R., 2022.
+\newblock Network based evidence of the financial impact of Covid-19 pandemic.
+\newblock \emph{International Review of Financial Analysis} 81, 102101. \url{https://doi.org/10.1016/j.irfa.2022.102101}
+
+\bibitem[Bekiros et~al., 2017]{bekiros2017information}
+Bekiros, S., Nguyen, D. K., Uddin, G. S., Sjo, B., 2017.
+\newblock Information diffusion, cluster formation and entropy-based network dynamics in equity and commodity markets.
+\newblock \emph{European Journal of Operational Research} 256(3), 945--961. \url{https://doi.org/10.1016/j.ejor.2016.06.052}
+
+\bibitem[Billio et~al., 2012]{billio2012econometric}
+Billio, M., Getmansky, M., Lo, A. W., Pelizzon, L., 2012.
+\newblock Econometric measures of connectedness and systemic risk in the finance and insurance sectors.
+\newblock \emph{Journal of Financial Economics} 104(3), 535--559. \url{https://doi.org/10.1016/j.jfineco.2011.12.010}
+
+\bibitem[Bouri et~al., 2021]{bouri2021return}
+Bouri, E., Cepni, O., Gabauer, D., Gupta, R., 2021.
+\newblock Return connectedness across asset classes around the COVID-19 outbreak.
+\newblock \emph{International Review of Financial Analysis} 73, 101646. \url{https://doi.org/10.1016/j.irfa.2020.101646}
+
+\bibitem[Brownlees et~al., 2017]{brownlees2017srisk}
+Brownlees, C., Engle, R. F., 2017.
+\newblock SRISK: A conditional capital shortfall measure of systemic risk.
+\newblock \emph{Review of Financial Studies} 30(1), 48--79. \url{https://doi.org/10.1093/rfs/hhw060}
+
+\bibitem[Diebold et~al., 2012]{diebold2012better}
+Diebold, F. X., Yilmaz, K., 2012.
+\newblock Better to give than to receive: Predictive directional measurement of volatility spillovers.
+\newblock \emph{International Journal of Forecasting} 28(1), 57--66. \url{https://doi.org/10.1016/j.ijforecast.2011.02.006}
+
+\bibitem[Diebold et~al., 2014]{diebold2014network}
+Diebold, F. X., Yilmaz, K., 2014.
+\newblock On the network topology of variance decompositions: Measuring the connectedness of financial firms.
+\newblock \emph{Journal of Econometrics} 182(1), 119--134. \url{https://doi.org/10.1016/j.jeconom.2014.04.012}
+
+\bibitem[Dimpfl et~al., 2013]{dimpfl2013using}
+Dimpfl, T., Peter, F. J., 2013.
+\newblock Using transfer entropy to measure dynamic information flows between markets.
+\newblock \emph{Journal of International Financial Markets, Institutions and Money} 27, 273--294. \url{https://doi.org/10.1016/j.intfin.2013.09.003}
+
+\bibitem[Edelman et~al., 1998]{edelman1998geometry}
+Edelman, A., Arias, T. A., Smith, S. T., 1998.
+\newblock The geometry of algorithms with orthogonality constraints.
+\newblock \emph{SIAM Journal on Matrix Analysis and Applications} 20(2), 303--353. \url{https://doi.org/10.1137/S0895479895290954}
+
+\bibitem[Hoel, 2017]{hoel2017when}
+Hoel, E. P., 2017.
+\newblock When the map is better than the territory.
+\newblock \emph{Entropy} 19(5), 188. \url{https://doi.org/10.3390/e19050188}
+
+\bibitem[Hoel et~al., 2013]{hoel2013quantifying}
+Hoel, E. P., Albantakis, L., Tononi, G., 2013.
+\newblock Quantifying causal emergence shows that macro can beat micro.
+\newblock \emph{Proceedings of the National Academy of Sciences} 110(49), 19790--19795. \url{https://doi.org/10.1073/pnas.1314922110}
+
+\bibitem[Klein et~al., 2020]{klein2020emergence}
+Klein, B., Hoel, E., 2020.
+\newblock The emergence of informative higher scales in complex networks.
+\newblock \emph{Complexity} 2020, 8932526. \url{https://doi.org/10.1155/2020/8932526}
+
+\bibitem[Kritzman et~al., 2011]{kritzman2011principal}
+Kritzman, M., Li, Y., Page, S., Rigobon, R., 2011.
+\newblock Principal components as a measure of systemic risk.
+\newblock \emph{Journal of Portfolio Management} 37(4), 112--126. \url{https://doi.org/10.3905/jpm.2011.37.4.112}
+
+\bibitem[Ledoit et~al., 2004]{ledoit2004well}
+Ledoit, O., Wolf, M., 2004.
+\newblock A well-conditioned estimator for large-dimensional covariance matrices.
+\newblock \emph{Journal of Multivariate Analysis} 88(2), 365--411. \url{https://doi.org/10.1016/S0047-259X(03)00096-4}
+
+\bibitem[Liu et~al., 2024]{liu2024exact}
+Liu, K., Yuan, B., Zhang, J., 2024.
+\newblock An exact theory of causal emergence for linear stochastic iteration systems.
+\newblock \emph{Entropy} 26(8), 618. \url{https://doi.org/10.3390/e26080618}
+
+\bibitem[Liu et~al., 2025]{liu2025singular}
+Liu, K., Pan, L., Wang, Z., Yang, M., Yuan, B., Zhang, J., 2025.
+\newblock Singular-value-decomposition-based causal emergence for Gaussian iterative systems.
+\newblock \emph{Physical Review E} 112(5), 054225. \url{https://doi.org/10.1103/PhysRevE.112.054225}
+
+\bibitem[Mensi et~al., 2021]{mensi2021spillovers}
+Mensi, W., Hernandez, J. A., Yoon, S.-M., Vo, X. V., Kang, S. H., 2021.
+\newblock Spillovers and connectedness between major precious metals and major currency markets: The role of frequency factor.
+\newblock \emph{International Review of Financial Analysis} 74, 101672. \url{https://doi.org/10.1016/j.irfa.2021.101672}
+
+\bibitem[Newey et~al., 1987]{newey1987hypothesis}
+Newey, W. K., West, K. D., 1987.
+\newblock A simple, positive semi-definite, heteroskedasticity and autocorrelation consistent covariance matrix.
+\newblock \emph{Econometrica} 55(3), 703--708. \url{https://doi.org/10.2307/1913610}
+
+\bibitem[Politis et~al., 1994]{politis1994stationary}
+Politis, D. N., Romano, J. P., 1994.
+\newblock The stationary bootstrap.
+\newblock \emph{Journal of the American Statistical Association} 89(428), 1303--1313. \url{https://doi.org/10.1080/01621459.1994.10476870}
+
+\bibitem[Rosas et~al., 2020]{rosas2020reconciling}
+Rosas, F. E., Mediano, P. A., Jensen, H. J., Seth, A. K., Barrett, A. B., Carhart-Harris, R. L., Bor, D., 2020.
+\newblock Reconciling emergences: An information-theoretic approach to identify causal emergence in multivariate data.
+\newblock \emph{PLoS Computational Biology} 16(12), e1008579. \url{https://doi.org/10.1371/journal.pcbi.1008579}
+
+\bibitem[Roy et~al., 2007]{roy2007effective}
+Roy, O., Vetterli, M., 2007.
+\newblock The effective rank: A measure of effective dimensionality.
+\newblock 15th European Signal Processing Conference (EUSIPCO 2007), 606--610.
+
+\bibitem[Schreiber, 2000]{schreiber2000measuring}
+Schreiber, T., 2000.
+\newblock Measuring information transfer.
+\newblock \emph{Physical Review Letters} 85(2), 461--464. \url{https://doi.org/10.1103/PhysRevLett.85.461}
+
+\bibitem[Yang et~al., 2025]{yang2025finding}
+Yang, M., Wang, Z., Liu, K., Rong, Y., Yuan, B., Zhang, J., 2025.
+\newblock Finding emergence in data by maximizing effective information.
+\newblock \emph{National Science Review} 12(1), nwae279. \url{https://doi.org/10.1093/nsr/nwae279}
+
+\bibitem[Yang et~al., 2023]{yang2023modeling}
+Yang, L., Hamori, S., 2023.
+\newblock Modeling the global sovereign credit network under climate change.
+\newblock \emph{International Review of Financial Analysis} 87, 102618. \url{https://doi.org/10.1016/j.irfa.2023.102618}
+
+\bibitem[Yousaf et~al., 2022]{yousaf2022linkages}
+Yousaf, I., Nekhili, R., Gubareva, M., 2022.
+\newblock Linkages between DeFi assets and conventional currencies: Evidence from the COVID-19 pandemic.
+\newblock \emph{International Review of Financial Analysis} 81, 102082. \url{https://doi.org/10.1016/j.irfa.2022.102082}
+\end{thebibliography}
+
+\end{document}

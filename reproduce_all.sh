@@ -3,26 +3,27 @@
 # Master Pipeline Reproduction Script for:
 # "Causal Emergence in Financial Markets: Dynamic Organization and Effective
 #  Dimensionality During Systemic Stress"
+# Target Journal: International Review of Financial Analysis (IRFA)
 # ==============================================================================
 
 set -e
 
-echo "=== [1/5] Running Unit Tests ==="
-PYTHONPATH=src pytest tests/ -v
+echo "=== [1/5] Running Complete Test Suite ==="
+PYTHONPATH=src python3 -m pytest tests/ -v
 
-echo "=== [2/5] Generating Main Rolling Time Series (1992-2026) ==="
-PYTHONPATH=src /opt/anaconda3/bin/python scripts/06_run_rolling_analysis.py --step 2
+echo "=== [2/5] Running Master Pre-Submission Diagnostics Suite ==="
+PYTHONPATH=src python3 scripts/17_run_master_closure_diagnostics.py
 
-echo "=== [3/5] Running Matched Null Models Statistical Inference (B=999) ==="
-PYTHONPATH=src /opt/anaconda3/bin/python scripts/07_run_null_inference.py --B 999
+echo "=== [3/5] Generating Publication Figures & Tables ==="
+PYTHONPATH=src python3 scripts/14_generate_manuscript_figures.py
+PYTHONPATH=src python3 scripts/15_financial_benchmarks_h4.py
 
-echo "=== [4/5] Running External Cross-Method Validation (Liu 2024, PRE 2025) ==="
-PYTHONPATH=src /opt/anaconda3/bin/python scripts/09_framework_robustness.py --step 10
-
-echo "=== [5/5] Generating Publication Vector Figures & Tables ==="
-PYTHONPATH=src /opt/anaconda3/bin/python scripts/14_generate_manuscript_figures.py
-PYTHONPATH=src /opt/anaconda3/bin/python scripts/15_financial_benchmarks_h4.py
+echo "=== [4/5] Compiling LaTeX Documents (Manuscript, Title Page, Appendix, Cover Letter) ==="
+pdflatex -interaction=nonstopmode manuscript.tex > /dev/null 2>&1
+pdflatex -interaction=nonstopmode Title_Page.tex > /dev/null 2>&1
+pdflatex -interaction=nonstopmode Supplementary_Appendix.tex > /dev/null 2>&1
+pdflatex -interaction=nonstopmode Cover_Letter.tex > /dev/null 2>&1
 
 echo "========================================================================"
-echo "Reproduction Complete! All results generated in reports/figures/ & reports/tables/"
+echo "Reproduction Complete! All outputs generated in reports/ & PDFs compiled."
 echo "========================================================================"

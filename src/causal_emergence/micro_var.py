@@ -11,7 +11,7 @@ import numpy as np
 
 def ledoit_wolf_shrinkage(residuals: np.ndarray) -> np.ndarray:
     """
-    Pure NumPy implementation of the Ledoit & Wolf (2004) analytical shrinkage covariance estimator:
+    Pure NumPy vectorized implementation of the Ledoit & Wolf (2004) analytical shrinkage covariance estimator:
         Sigma = (1 - delta) * S + delta * mu * I_p
     """
     T, p = residuals.shape
@@ -25,18 +25,14 @@ def ledoit_wolf_shrinkage(residuals: np.ndarray) -> np.ndarray:
     # d2 = ||S - mu*I||_F^2
     d2 = np.sum((S - target) ** 2)
 
-    # Asymptotic variance of sample covariance elements
-    # b_bar^2 = (1 / T^2) * sum_t ||x_t x_t.T - S||_F^2
-    b_bar_sq = 0.0
-    for t in range(T):
-        x_t = residuals[t : t + 1, :]  # Shape (1, p)
-        outer_t = x_t.T @ x_t
-        b_bar_sq += np.sum((outer_t - S) ** 2)
-    b_bar_sq /= (T ** 2)
+    # Vectorized asymptotic variance: b_bar^2 = (1 / T^2) * sum_t ||x_t x_t.T - S||_F^2
+    X2 = residuals ** 2
+    sum_outer_sq = X2.T @ X2
+    b_bar_sq = float((np.sum(sum_outer_sq) - T * np.sum(S ** 2)) / (T ** 2))
 
     # Optimal shrinkage intensity bounded in [0, 1]
     b2 = min(b_bar_sq, d2)
-    delta = 0.0 if d2 == 0 else max(0.0, min(1.0, b2 / d2))
+    delta = 0.0 if d2 <= 0 else max(0.0, min(1.0, b2 / d2))
 
     shrunk_cov = (1.0 - delta) * S + delta * target
     return 0.5 * (shrunk_cov + shrunk_cov.T)
@@ -100,13 +96,7 @@ def fit_micro_var1(
 
     # Estimate residual covariance Sigma_eps
     if method == "ledoit_wolf":
-        try:
-            from sklearn.covariance import LedoitWolf
-            lw = LedoitWolf(assume_centered=True)
-            lw.fit(residuals)
-            Sigma_eps = lw.covariance_
-        except ImportError:
-            Sigma_eps = ledoit_wolf_shrinkage(residuals)
+        Sigma_eps = ledoit_wolf_shrinkage(residuals)
     elif method == "ridge":
         sample_cov = (residuals.T @ residuals) / (T - 1)
         Sigma_eps = sample_cov + ridge_alpha * np.eye(p)

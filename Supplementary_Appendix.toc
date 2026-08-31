@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Scale-Invariance Numerical Test and Formal Derivation}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Mathematical Derivation of Scale Invariance}{3}{subsection.1.1}%
+\contentsline {paragraph}{Scope Delimitation.}{4}{section*.2}%
+\contentsline {section}{\numberline {2}VAR Transition Matrix Orientation: Mathematical Derivation and Synthetic Test}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Synthetic Non-Symmetric Recovery Audit}{5}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Macro-Dynamics: Interventional Lifting and Observational Closure Diagnostic}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Interventional Channel Construction via Canonical Lifting}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Observational Projection and Closure Error Diagnostic}{6}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Optimizer Budget Sensitivity Diagnostic}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Riemannian Gradient and Canonical Metric Duality on Row-Stiefel}{7}{subsection.4.1}%
+\contentsline {paragraph}{Theorem (Canonical Metric Inner Product Duality).}{7}{section*.5}%
+\contentsline {subsection}{\numberline {4.2}Optimizer Budget Sensitivity and Calibration Diagnostic}{7}{subsection.4.2}%
+\contentsline {section}{\numberline {5}VAR Stability and Spectral Radius Diagnostics}{8}{section.5}%
+\contentsline {section}{\numberline {6}VAR Dynamic Specification and Lag Adequacy Diagnostics}{8}{section.6}%
+\contentsline {section}{\numberline {7}Full Matched Null Hierarchy Simulation Protocol and Results}{9}{section.7}%
+\contentsline {section}{\numberline {8}Multiple-Testing Adjustments and Sensitivity Analysis}{9}{section.8}%
+\contentsline {section}{\numberline {9}Causal Effective Dimension ($q^*$) vs. Static Covariance Dimensionality}{9}{section.9}%
+\contentsline {section}{\numberline {10}Conventional Systemic Risk Benchmarks: Collinearity and Residualized CEFI}{10}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Multicollinearity Diagnostics}{10}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Residualized CEFI Analysis}{10}{subsection.10.2}%
+\contentsline {section}{\numberline {11}Event Study Regressions: Full HAC Lag Bandwidth Sensitivity}{11}{section.11}%
+\contentsline {section}{\numberline {12}Leave-One-Episode-Out Crisis Sensitivity Analysis}{11}{section.12}%
+\contentsline {section}{\numberline {13}Sensitivity to Intervention Scale Parameter $\kappa $}{12}{section.13}%
+\contentsline {section}{\numberline {14}Sensitivity to Rolling Window Length $W$}{12}{section.14}%
+\contentsline {section}{\numberline {15}Cross-Universe Robustness: Fama-French 49 Industry Cross-Section}{12}{section.15}%
+\contentsline {section}{\numberline {16}Computational Environment and Software Manifest}{13}{section.16}%

@@ -1,0 +1,7 @@
+Claim_ID,Claim_Statement,Evidence_Source,Numerical_Evidence,Audit_Status
+C1,Causal emergence is state-dependent; calm periods are indistinguishable from matched nulls.,reports/tables/primary_null_inference_b9999.csv,"2005 Calm: H0_diag+contemp p_raw=0.6215, p_Holm=0.6215, z=-0.35",VERIFIED_EXACT
+C2,2008 GFC exhibits significant emergence beyond static correlation and cross-lag isolation.,reports/tables/primary_null_inference_b9999.csv,GFC: H0_static p_raw=0.0014 (p_Holm=0.0042); H0_dc p_raw=0.0001 (p_Holm=0.0006),VERIFIED_EXACT
+C3,2020 COVID shock exhibits significant emergence beyond static correlation and cross-lag isolation at trough.,reports/tables/primary_null_inference_b9999.csv,COVID (2020-03-23): H0_static p_raw=0.0001 (p_Holm=0.0006); H0_dc p_raw=0.0001 (p_Holm=0.0006),VERIFIED_EXACT
+C4,Liquidity crises concentrate into lower effective dimension than valuation repricing.,reports/tables/table_episode_level_summary.csv,Liquidity: modal q*=2 (80.8% q*<=4) vs Valuation: modal q*=4 (48.9% q*<=4),VERIFIED_EXACT
+C5,CEFI is higher in liquidity crises than valuation repricing across full sample and leave-one-out.,reports/tables/table_leave_one_out_sensitivity.csv,"Full: Delta Beta=+0.691 (Wald t=7.11, p=1.16e-12); Leave-one-out: Delta Beta in [+0.338, +0.869], all Wald t>=3.10",VERIFIED_EXACT
+C6,Riemannian Stiefel CEFI achieves high concordance with external continuous emergence benchmarks.,reports/tables/table_disaggregated_benchmarking.csv,Exact continuous EI (Liu et al. 2024): rho=0.837; SVD emergence (Liu et al. 2025): rho=0.832,VERIFIED_EXACT
