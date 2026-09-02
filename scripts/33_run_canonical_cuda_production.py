@@ -540,10 +540,17 @@ def run_phase_5_cross_method_benchmarking():
         S_eps_batch.append(S_eps_m)
         S_x_batch.append(S_x_m)
 
-        res_liu = compute_liu_exact_emergence(A_m, S_eps_m, q_candidates=q_all)
-        res_svd = compute_svd_causal_emergence(A_m, S_eps_m, Sigma_x=S_x_m, q_candidates=q_all)
-        liu_res_list.append(res_liu)
-        svd_res_list.append(res_svd)
+        # SVD Projections for Liu (2024)
+        Sigma_clean = 0.5 * (S_eps_m + S_eps_m.T) + 1e-10 * (np.trace(S_eps_m) / float(p)) * np.eye(p)
+        L_chol = np.linalg.cholesky(Sigma_clean)
+        K_mat = np.linalg.solve(L_chol, A_m)
+        U_svd, _, _ = np.linalg.svd(K_mat, full_matrices=False)
+        W_dict_svd = {q: U_svd[:, :q].T for q in q_all}
+
+        delta_J_max, q_star_liu, _ = compute_liu_exact_emergence(A_m, S_eps_m, W_dict=W_dict_svd, Sigma_x=S_x_m)
+        ce_svd_max, q_star_svd, _, _ = compute_svd_causal_emergence(A_m, S_eps_m, Sigma_x=S_x_m, kappa_do=1.0)
+        liu_res_list.append((delta_J_max, q_star_liu))
+        svd_res_list.append((ce_svd_max, q_star_svd))
 
     A_batch = np.stack(A_batch, axis=0)
     S_eps_batch = np.stack(S_eps_batch, axis=0)
@@ -555,15 +562,15 @@ def run_phase_5_cross_method_benchmarking():
     )
 
     rows = []
-    for d, c_s, q_s, r_l, r_svd in zip(task_dates, c_stiefel, q_stiefel, liu_res_list, svd_res_list):
+    for d, c_s, q_s, (dJ_l, q_l), (ce_svd, q_svd) in zip(task_dates, c_stiefel, q_stiefel, liu_res_list, svd_res_list):
         rows.append({
             "date": d,
             "cefi_stiefel": c_s,
             "q_stiefel": q_s,
-            "cefi_liu2024": r_l["delta_J_max"],
-            "q_liu2024": r_l["q_star"],
-            "cefi_svd2025": r_svd["ce_svd_max"],
-            "q_svd2025": r_svd["q_star"]
+            "cefi_liu2024": dJ_l,
+            "q_liu2024": q_l,
+            "cefi_svd2025": ce_svd,
+            "q_svd2025": q_svd
         })
 
     df_bench = pd.DataFrame(rows).set_index("date")
