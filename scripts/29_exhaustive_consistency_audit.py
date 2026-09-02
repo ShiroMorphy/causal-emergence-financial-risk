@@ -133,8 +133,8 @@ def run_exhaustive_audit():
     else:
         print("[PASS] Wald statistic updated to t >= 3.10 across all documents.")
 
-    # Check 12: Event Study HAC Synchronization
-    for w in ["+8.31", "+7.11", "+6.24", "+5.20", "+4.98"]:
+    # Check 12: Event Study HAC Synchronization (12/100 Canonical)
+    for w in ["+6.39", "+5.01", "+4.44", "+3.85", "+3.75"]:
         if w not in ms_src or w not in app_src:
             errors.append(f"[FAIL] HAC contrast Wald t-stat {w} missing from Table 3 or Table A11.")
     if not any("HAC contrast" in e for e in errors):

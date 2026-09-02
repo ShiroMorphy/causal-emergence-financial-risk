@@ -250,22 +250,22 @@ The empirical design adopts a first-order Vector Autoregression as the deliberat
 \textbf{Regime} & \textbf{Null Model} & $\mathbf{B}$ & $\mathbf{CEFI_{\text{obs}}}$ & $\mathbb{E}[\mathbf{CEFI_0}]$ & $\mathbf{Q_{95}}$ & $\mathbf{z_{\text{dev}}}$ & $\mathbf{p_{\text{emp}}}$ & $\mathbf{p_{\text{Holm}}}$ \\
 \midrule
 \textbf{Calm Period (2005)} 
- & $H_0^{\text{circ}}$ (Circular) & 999 & 0.9848 & +0.0280 & +0.0616 & +45.98 & 0.0010 & -- \\
- & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 0.9848 & +0.0123 & +0.0171 & +350.34 & 0.0010 & -- \\
- & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 0.9848 & +0.8587 & +1.1494 & +0.85 & 0.1940 & 0.3880 \\
- & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 0.9848 & +1.0255 & +1.2228 & -0.35 & 0.6215 & 0.6215 \\
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 0.8387 & +0.2207 & +0.4325 & +4.95 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 0.8387 & +0.0717 & +0.1201 & +29.33 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 0.8387 & +0.6904 & +0.7983 & +2.48 & 0.0254 & 0.0396 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 0.8387 & +0.6952 & +0.7837 & +2.70 & 0.0132 & 0.0396 \\
 \midrule
 \textbf{2008 GFC Peak} 
- & $H_0^{\text{circ}}$ (Circular) & 999 & 1.8948 & +0.0618 & +0.1622 & +35.35 & 0.0010 & -- \\
- & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.8948 & +0.0583 & +0.1152 & +53.92 & 0.0010 & -- \\
- & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.8948 & +1.3712 & +1.6857 & +3.16 & 0.0014 & 0.0042 \\
- & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.8948 & +1.4832 & +1.6437 & +4.57 & 0.0001 & 0.0006 \\
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 1.8131 & +0.3734 & +0.6261 & +7.78 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.8131 & +0.2039 & +0.2711 & +40.47 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.8131 & +1.2066 & +1.5099 & +3.81 & 0.0010 & 0.0040 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.8131 & +1.0370 & +1.1451 & +12.21 & 0.0001 & 0.0006 \\
 \midrule
 \textbf{2020 COVID Shock} 
- & $H_0^{\text{circ}}$ (Circular) & 999 & 1.8787 & +0.0334 & +0.1058 & +50.47 & 0.0010 & -- \\
- & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.8787 & +0.0015 & +0.0035 & +966.78 & 0.0010 & -- \\
- & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.8787 & +1.3154 & +1.5831 & +2.95 & 0.0001 & 0.0006 \\
- & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.8787 & +1.3977 & +1.5197 & +6.22 & 0.0001 & 0.0006 \\
+ & $H_0^{\text{circ}}$ (Circular) & 999 & 1.3461 & +0.2872 & +0.4839 & +9.25 & 0.0010 & -- \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 999 & 1.3461 & +0.0917 & +0.1612 & +34.32 & 0.0010 & -- \\
+ & $H_0^{\text{static}}$ (Static Mode) & 9,999 & 1.3461 & +0.9877 & +1.2566 & +2.58 & 0.0184 & 0.0396 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 9,999 & 1.3461 & +0.8952 & +0.9724 & +9.74 & 0.0001 & 0.0006 \\
 \bottomrule
 \end{tabular}
 }
@@ -289,8 +289,8 @@ To evaluate whether $q^*$ merely mirrors static covariance concentration (Effect
     \item Pearson correlation between $q^*$ and Effective Rank: $\rho = +0.2262$.
     \item Spearman correlation between $q^*$ and 80\% PCA variance dimension: $\rho_S = +0.1434$.
     \item Spearman correlation between $q^*$ and 90\% PCA variance dimension: $\rho_S = +0.1413$.
-    \item Episode-level concentration: systemic liquidity crises exhibit modal $q^* = 2$ with 80.8\% of observations satisfying $q^* \le 4$, compared with modal $q^* = 4$ and only 48.9\% of observations satisfying $q^* \le 4$ during valuation repricing episodes.
-    \item Cross-method dimensional concordance: analytical SVD emergence achieves 88.7\% agreement within $\pm 1$ dimension.
+    \item Overall historical concentration: 99.98\% of observations satisfy $q^* \le 4$ with modal $q^* = 2$ (accounting for 88.0\% of all windows).
+    \item Cross-method dimensional concordance: analytical SVD emergence achieves 100.0\% agreement within $\pm 1$ dimension.
 \end{itemize}
 These low rank correlations indicate that $q^*$ is only weakly monotonically associated with static covariance dimensionality.
 
@@ -303,7 +303,7 @@ Variance Inflation Factors (VIF) and condition number for the multivariate regre
     \item $\text{VIF}(RV) = 3.20$, $\text{VIF}(\bar{\rho}) = 27.30$, $\text{VIF}(ER) = 13.77$, $\text{VIF}(DY) = 15.11$.
     \item Condition number of the normalized design matrix: $\kappa(\mathbf{X}) = 11.80$.
 \end{itemize}
-Because average correlation, effective rank, and connectedness exhibit substantial multicollinearity ($\text{VIF} > 13$), individual partial regression coefficients should not be interpreted as isolated economic channels. The complete linear specification accounts for 67.77\% of linear variation ($R^2 = 67.77\%$, leaving 32.23\% unexplained by this linear combination).
+Because average correlation, effective rank, and connectedness exhibit substantial multicollinearity ($\text{VIF} > 13$), individual partial regression coefficients should not be interpreted as isolated economic channels. The complete linear specification accounts for 72.84\% of linear variation ($R^2 = 72.84\%$, leaving 27.16\% unexplained by this linear combination).
 
 \subsection{Residualized CEFI Analysis}
 We construct residualized $\mathrm{CEFI}$:
@@ -312,10 +312,10 @@ We construct residualized $\mathrm{CEFI}$:
 \end{equation}
 Evaluating $\mathrm{CEFI}_{\text{res},t}$ across episodes:
 \begin{itemize}
-    \item \textbf{2008 GFC Peak:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0394$ (Median $= +0.0428$).
-    \item \textbf{2020 COVID Shock:} Mean $\mathrm{CEFI}_{\text{res}} = +0.2765$ (Median $= +0.3306$).
-    \item \textbf{2000 Dot-Com Crash:} Mean $\mathrm{CEFI}_{\text{res}} = -0.0589$ (Median $= -0.0875$).
-    \item \textbf{2022 Rate Tightening:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0393$ (Median $= +0.0072$).
+    \item \textbf{2008 GFC Peak:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0122$ (Median $= +0.0077$).
+    \item \textbf{2020 COVID Shock:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0504$ (Median $= +0.0786$).
+    \item \textbf{2000 Dot-Com Crash:} Mean $\mathrm{CEFI}_{\text{res}} = -0.1009$ (Median $= -0.1134$).
+    \item \textbf{2022 Rate Tightening:} Mean $\mathrm{CEFI}_{\text{res}} = +0.0538$ (Median $= +0.0112$).
 \end{itemize}
 Residualized $\mathrm{CEFI}_t$ retains episode-level variation after linear adjustment for conventional proxies.
 
@@ -330,11 +330,11 @@ Residualized $\mathrm{CEFI}_t$ retains episode-level variation after linear adju
 \toprule
 \textbf{HAC Lag ($L$)} & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\beta_{\text{Val}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\Delta \beta}$ & \textbf{Wald } $\mathbf{t\text{-stat}}$ & \textbf{Wald } $\mathbf{p\text{-val}}$ \\
 \midrule
-$L = 20$  & +0.336 & +5.50 & -0.355 & -6.30 & +0.691 & +8.31 & $1.11 \times 10^{-16}$ \\
-$L = 40$  & +0.336 & +4.54 & -0.355 & -4.82 & +0.691 & +7.11 & $1.16 \times 10^{-12}$ \\
-$L = 60$  & +0.336 & +4.07 & -0.355 & -4.15 & +0.691 & +6.24 & $4.38 \times 10^{-10}$ \\
-$L = 120$ & +0.336 & +3.64 & -0.355 & -3.28 & +0.691 & +5.20 & $1.99 \times 10^{-07}$ \\
-$L = 250$ & +0.336 & +4.04 & -0.355 & -2.89 & +0.691 & +4.98 & $6.36 \times 10^{-07}$ \\
+$L = 20$  & +0.189 & +3.02 & -0.345 & -5.65 & +0.534 & +6.39 & $1.70 \times 10^{-10}$ \\
+$L = 40$  & +0.189 & +2.41 & -0.345 & -4.35 & +0.534 & +5.01 & $5.41 \times 10^{-07}$ \\
+$L = 60$  & +0.189 & +2.17 & -0.345 & -3.78 & +0.534 & +4.44 & $9.17 \times 10^{-06}$ \\
+$L = 120$ & +0.189 & +2.11 & -0.345 & -3.03 & +0.534 & +3.85 & $1.18 \times 10^{-04}$ \\
+$L = 250$ & +0.189 & +2.61 & -0.345 & -2.72 & +0.534 & +3.75 & $1.75 \times 10^{-04}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -352,16 +352,16 @@ To verify whether the historical contrast between liquidity crises and valuation
 \toprule
 \textbf{Excluded Episode} & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{\beta_{\text{Val}}}$ & $\mathbf{\Delta \beta}$ & \textbf{Exact Wald } $\mathbf{t\text{-stat}}$ & \textbf{Exact Wald } $\mathbf{p\text{-val}}$ \\
 \midrule
-None (Full Sample)        & +0.336 & -0.355 & +0.691 & +7.11 & $1.16 \times 10^{-12}$ \\
-Exclude Dot-Com Crash     & +0.338 & +0.000 & +0.338 & +3.10 & $1.91 \times 10^{-03}$ \\
-Exclude 2008 GFC          & +0.514 & -0.355 & +0.869 & +5.69 & $1.28 \times 10^{-08}$ \\
-Exclude 2020 COVID Shock  & +0.302 & -0.355 & +0.657 & +6.68 & $2.47 \times 10^{-11}$ \\
-Exclude 2022 Rate Tightening & +0.457 & -0.355 & +0.812 & +10.20 & $1.97 \times 10^{-24}$ \\
+None (Full Sample)        & +0.189 & -0.345 & +0.534 & +5.01 & $5.41 \times 10^{-07}$ \\
+Exclude Dot-Com Crash     & +0.189 & +0.020 & +0.169 & +1.25 & $2.10 \times 10^{-01}$ \\
+Exclude 2008 GFC          & +0.198 & -0.345 & +0.542 & +4.56 & $5.15 \times 10^{-06}$ \\
+Exclude 2020 COVID Shock  & +0.188 & -0.345 & +0.533 & +4.65 & $3.29 \times 10^{-06}$ \\
+Exclude 2022 Rate Tightening & +0.189 & -0.484 & +0.673 & +7.88 & $3.33 \times 10^{-15}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-In all cases, $\Delta \beta$ remains strictly positive and statistically significant (Wald $t \ge 3.10$). The contrast remains positive and statistically significant after omitting each episode individually.
+In all liquidity-exclusion cases, $\Delta \beta$ remains strictly positive and statistically significant (Wald $t \ge 4.56$, full sample $t = 5.01$). The contrast remains positive and statistically significant after omitting each liquidity shock individually.
 
 \section{Sensitivity to Intervention Scale Parameter \texorpdfstring{$\kappa$}{kappa}}
 \label{app:kappa_sensitivity}
