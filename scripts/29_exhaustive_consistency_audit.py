@@ -141,13 +141,15 @@ def run_exhaustive_audit():
     if not any("Canonical HAC contrast" in e for e in errors):
         print("[PASS] Table 3 and Table A10 HAC statistics 100% synchronized (+3.11, +2.40, +2.12, +1.83, +1.71).")
 
-    # Check 13: Anonymity of Manuscript & Supplement
-    if "Felipe Mora" in ms_pdf_text:
-        errors.append("[FAIL] Author name found in main manuscript.pdf (must be anonymous).")
-    elif "Felipe Mora" in app_pdf_text:
-        errors.append("[FAIL] Author name found in Supplementary_Appendix.pdf (must be anonymous).")
-    else:
-        print("[PASS] Main manuscript and Supplementary Appendix are strictly anonymous.")
+    # Check 13: Anonymity of Manuscript & Supplement (Double-Blind Compliance)
+    identifying_terms = ["Felipe Mora", "ShiroMorphy", "morar@usm.cl"]
+    for term in identifying_terms:
+        if term in ms_pdf_text or term in ms_src:
+            errors.append(f"[FAIL] Identifying term '{term}' found in main manuscript (must be anonymous).")
+        if term in app_pdf_text or term in app_src:
+            errors.append(f"[FAIL] Identifying term '{term}' found in Supplementary_Appendix (must be anonymous).")
+    if not any("must be anonymous" in e for e in errors):
+        print("[PASS] Main manuscript and Supplementary Appendix are strictly anonymous (zero author names, usernames, or identifying links).")
 
     # Check 14: Verified Bibliography Metadata
     if "102101" not in ms_src or "101672" not in ms_src or "102618" not in ms_src:
@@ -206,11 +208,13 @@ def run_exhaustive_audit():
     else:
         print("[PASS] Unhedged 'establish' verbs replaced with prudent wording (show, document, indicate).")
 
-    # Check 23: Data and Code Availability verified
-    if "Zenodo / GitHub" in ms_src or "https://github.com/ShiroMorphy/causal-emergence-financial-risk" not in ms_src or "49 Industry Portfolios" not in ms_src:
-        errors.append("[FAIL] Data and Code Availability statement contains placeholder, missing GitHub URL, or missing FF49.")
+    # Check 23: Data and Code Availability verified (Blinded in Manuscript, Public in Title Page)
+    if "Zenodo / GitHub" in ms_src or "49 Industry Portfolios" not in ms_src or "anonymized replication repository" not in ms_src:
+        errors.append("[FAIL] Manuscript Data and Code Availability statement contains placeholder, missing FF49, or missing anonymized repository notice.")
+    elif "https://github.com/ShiroMorphy/causal-emergence-financial-risk" not in tp_src:
+        errors.append("[FAIL] Public repository URL missing from non-anonymous Title_Page.tex.")
     else:
-        print("[PASS] Data and Code Availability statement verified (FF30, FF49, repository URL, no placeholders).")
+        print("[PASS] Data and Code Availability statement verified (anonymized in manuscript, public repository in Title Page, no placeholders).")
 
     # Check 24: Residualized CEFI narrow wording verified
     if "co-aligned with conventional" in ms_src or "predominantly concentrated" in ms_src:
