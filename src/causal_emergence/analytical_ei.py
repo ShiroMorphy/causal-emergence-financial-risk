@@ -96,9 +96,9 @@ def compute_macro_dynamics(
     Projects micro-dynamics to macro-dynamics via coarse-graining matrix W:
         y_t = W x_t,   with W in Stiefel manifold V_q(R^p) (i.e. W @ W.T = I_q)
 
-    Exact Gaussian conditional Markov projection:
-        E[y_{t+1} | y_t] = W A E[x_t | y_t] = W A Sigma_x W^T (W Sigma_x W^T)^{-1} y_t
-        A_y = W A Sigma_x W^T (W Sigma_x W^T)^{-1}
+    Constructed macro interventional channel under the canonical lifting x = W^T y:
+        y_{t+1} = W A W^T y_t + W eps_{t+1}
+        A_y = W A W^T
         Sigma_eps_y = W Sigma_eps W^T
         Sigma_x_y = W Sigma_x W^T
 
@@ -118,14 +118,11 @@ def compute_macro_dynamics(
     q = W.shape[0]
     Sigma_eps_y = W @ Sigma_eps @ W.T
 
+    A_y = W @ A @ W.T
     if Sigma_x is not None:
         Sigma_x_clean = 0.5 * (Sigma_x + Sigma_x.T) + 1e-12 * np.eye(Sigma_x.shape[0])
         Sigma_x_y = W @ Sigma_x_clean @ W.T
-        Sigma_x_y = 0.5 * (Sigma_x_y + Sigma_x_y.T) + 1e-12 * np.eye(q)
-        # Optimal conditional projection: A_y = (W A Sigma_x W.T) @ inv(Sigma_x_y)
-        A_y = (W @ A @ Sigma_x_clean @ W.T) @ np.linalg.pinv(Sigma_x_y)
     else:
-        A_y = W @ A @ W.T
         Sigma_x_y = None
 
     return A_y, Sigma_eps_y, Sigma_x_y
@@ -142,16 +139,21 @@ def compute_macro_ei(
     """
     Computes Effective Information for the macro-system induced by coarse-graining W.
     """
-    A_y, Sigma_eps_y, Sigma_x_y = compute_macro_dynamics(A, Sigma_eps, W, Sigma_x=Sigma_x)
+    A_y, Sigma_eps_y, _ = compute_macro_dynamics(A, Sigma_eps, W, Sigma_x=Sigma_x)
+    if sigma_do is None and Sigma_x is not None:
+        # Keep the micro-system's isotropic intervention variance unchanged at
+        # every macro dimension, as specified in the manuscript.
+        sigma_do = kappa_do * np.sqrt(max(float(np.trace(Sigma_x) / A.shape[0]), 1e-12))
     return compute_continuous_ei(
-        A_y, Sigma_eps_y, Sigma_x=Sigma_x_y, kappa_do=kappa_do, sigma_do=sigma_do
+        A_y, Sigma_eps_y, Sigma_x=None, kappa_do=kappa_do, sigma_do=sigma_do
     )
 
 
 def compute_emergence_spectrum(
     ei_micro: float,
     macro_ei_dict: Dict[int, float],
-    p_micro: Optional[int] = None
+    p_micro: Optional[int] = None,
+    tie_tolerance: float = 1e-7,
 ) -> Tuple[float, int, Dict[int, float], float]:
     """
     Evaluates Causal Emergence Financial Index (CEFI) and Causal Effective Dimension (q*).
@@ -186,8 +188,14 @@ def compute_emergence_spectrum(
         for q, macro_ei in macro_ei_dict.items()
     }
 
-    # Optimal macro dimension q* maximizes causal information density
-    best_q = max(density_deltas, key=density_deltas.get)
+    # Manuscript rule: choose the smallest q within epsilon of the global
+    # maximum. A streaming comparison against the current best is not
+    # equivalent when several near-ties form a chain.
+    maximum_density = max(density_deltas.values())
+    best_q = min(
+        q for q, density in density_deltas.items()
+        if density >= maximum_density - float(tie_tolerance)
+    )
     cefi_density = float(density_deltas[best_q])
 
     # Raw unnormalized difference

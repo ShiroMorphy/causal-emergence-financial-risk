@@ -67,6 +67,34 @@ references = [
         "Status": "VERIFIED"
     },
     {
+        "CitationKey": "ardakani2024transfer",
+        "Authors": "Ardakani, O. M.",
+        "Year": 2024,
+        "Title": "Portfolio optimization with transfer entropy constraints",
+        "Journal": "International Review of Financial Analysis",
+        "Volume": "96",
+        "Issue": "",
+        "Pages_or_Article": "103644",
+        "DOI": "10.1016/j.irfa.2024.103644",
+        "PrimarySourceVerified": "YES",
+        "UsedInText": "YES",
+        "Status": "VERIFIED"
+    },
+    {
+        "CitationKey": "barunik2018measuring",
+        "Authors": "Baruník, J., Křehlík, T.",
+        "Year": 2018,
+        "Title": "Measuring the frequency dynamics of financial connectedness and systemic risk",
+        "Journal": "Journal of Financial Econometrics",
+        "Volume": "16",
+        "Issue": "2",
+        "Pages_or_Article": "271--296",
+        "DOI": "10.1093/jjfinec/nby001",
+        "PrimarySourceVerified": "YES",
+        "UsedInText": "YES",
+        "Status": "VERIFIED"
+    },
+    {
         "CitationKey": "bekiros2017information",
         "Authors": "Bekiros, S., Nguyen, D. K., Uddin, G. S., Sjo, B.",
         "Year": 2017,
@@ -118,6 +146,20 @@ references = [
         "Issue": "1",
         "Pages_or_Article": "48--79",
         "DOI": "10.1093/rfs/hhw060",
+        "PrimarySourceVerified": "YES",
+        "UsedInText": "YES",
+        "Status": "VERIFIED"
+    },
+    {
+        "CitationKey": "demirer2018estimating",
+        "Authors": "Demirer, M., Diebold, F. X., Liu, L., Yilmaz, K.",
+        "Year": 2018,
+        "Title": "Estimating global bank network connectedness",
+        "Journal": "Journal of Applied Econometrics",
+        "Volume": "33",
+        "Issue": "1",
+        "Pages_or_Article": "1--15",
+        "DOI": "10.1002/jae.2585",
         "PrimarySourceVerified": "YES",
         "UsedInText": "YES",
         "Status": "VERIFIED"
@@ -271,7 +313,7 @@ references = [
         "Volume": "112",
         "Issue": "5",
         "Pages_or_Article": "054225",
-        "DOI": "10.1103/PhysRevE.112.054225",
+        "DOI": "10.1103/mfct-sxn5",
         "PrimarySourceVerified": "YES",
         "UsedInText": "YES",
         "Status": "VERIFIED"
@@ -384,6 +426,20 @@ references = [
         "Issue": "1",
         "Pages_or_Article": "nwae279",
         "DOI": "10.1093/nsr/nwae279",
+        "PrimarySourceVerified": "YES",
+        "UsedInText": "YES",
+        "Status": "VERIFIED"
+    },
+    {
+        "CitationKey": "yao2025interindustry",
+        "Authors": "Yao, C.-Z., Li, Y.-L.",
+        "Year": 2025,
+        "Title": "Structural evolution of industry association networks in Chinese stock market under major event shocks: A comparative analysis of two crises based on partial Granger causal networks",
+        "Journal": "International Review of Financial Analysis",
+        "Volume": "107",
+        "Issue": "",
+        "Pages_or_Article": "104572",
+        "DOI": "10.1016/j.irfa.2025.104572",
         "PrimarySourceVerified": "YES",
         "UsedInText": "YES",
         "Status": "VERIFIED"

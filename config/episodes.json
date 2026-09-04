@@ -1,0 +1,38 @@
+{
+  "Dot-Com Crash": {
+    "display_name": "Dot-Com Crash (2000--02)",
+    "start_date": "2000-03-01",
+    "end_date": "2002-10-09",
+    "stress_class": "Valuation Repricing",
+    "rationale": "Valuation bubble collapse concentrated in technology and telecom, ending at the Nasdaq bear market trough on October 9, 2002.",
+    "color": "#cbd5e1",
+    "alpha": 0.45
+  },
+  "2008 GFC Peak": {
+    "display_name": "2008 GFC (2007--09)",
+    "start_date": "2007-10-01",
+    "end_date": "2009-03-31",
+    "stress_class": "Systemic Liquidity",
+    "rationale": "Systemic banking contagion, credit freeze, and acute equity market liquidation ending at the Q1 2009 broad market trough.",
+    "color": "#fed7aa",
+    "alpha": 0.65
+  },
+  "2020 COVID Shock": {
+    "display_name": "2020 COVID (2020)",
+    "start_date": "2020-02-01",
+    "end_date": "2020-04-30",
+    "stress_class": "Systemic Liquidity",
+    "rationale": "Acute lockdown shock, global cross-asset liquidation, and subsequent central bank emergency liquidity interventions.",
+    "color": "#bbf7d0",
+    "alpha": 0.65
+  },
+  "2022 Rate Tightening": {
+    "display_name": "2022 Tightening (2022)",
+    "start_date": "2022-01-01",
+    "end_date": "2022-12-31",
+    "stress_class": "Valuation Repricing",
+    "rationale": "Macro-monetary discount rate repricing across the full calendar year 2022 Federal Reserve aggressive rate-hiking cycle.",
+    "color": "#e9d5ff",
+    "alpha": 0.5
+  }
+}

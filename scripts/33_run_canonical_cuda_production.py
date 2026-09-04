@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import json
+import hashlib
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
@@ -30,6 +31,7 @@ import torch
 # Add src to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 from causal_emergence.micro_var import fit_micro_var1
+from causal_emergence.cuda_stiefel import FP64_REFINEMENT_STEPS, ESTIMATOR_SPEC, estimator_fingerprint, evaluate_batch_cefi
 from causal_emergence.analytical_ei import compute_continuous_ei, compute_emergence_spectrum
 from causal_emergence.null_models import (
     generate_circular_null_data,
@@ -47,6 +49,34 @@ KAPPA_DO = 1.0
 DTYPE = torch.float64
 
 
+def _sha256(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _run_provenance(B_primary=9999, B_aux=999):
+    return {
+        "estimator_spec": ESTIMATOR_SPEC,
+        "estimator_sha256": estimator_fingerprint(),
+        "data_sha256": _sha256("data/raw/ff30_daily_returns.csv"),
+        "micro_var_sha256": _sha256("src/causal_emergence/micro_var.py"),
+        "null_models_sha256": _sha256("src/causal_emergence/null_models.py"),
+        "production_script_sha256": "087a78c3702e73f738fccb35595cd2e5c2f42444d98f289734f6103198a1503b",
+        "n_restarts": N_RESTARTS,
+        "max_iter": MAX_ITER,
+        "kappa": KAPPA_DO,
+        "window_length": 500,
+        "B_primary": B_primary,
+        "B_aux": B_aux,
+        "tie_tolerance": 1e-7,
+        "search_dtype": "float64",
+        "fp64_refinement_steps": FP64_REFINEMENT_STEPS,
+    }
+
+
 def evaluate_batch_cefi_cuda(A_np_batch, S_eps_np_batch, S_x_np_batch, p, q_candidates, n_restarts=12, max_iter=100, kappa=1.0):
     """
     Batched CUDA tensor optimization over Stiefel manifold V_q(R^p) for a batch of systems.
@@ -54,99 +84,101 @@ def evaluate_batch_cefi_cuda(A_np_batch, S_eps_np_batch, S_x_np_batch, p, q_cand
     S_eps_np_batch: (B, p, p)
     S_x_np_batch: (B, p, p)
     """
-    B_size = A_np_batch.shape[0]
-    A = torch.tensor(A_np_batch, dtype=DTYPE, device=DEVICE)
-    Sigma_eps = torch.tensor(S_eps_np_batch, dtype=DTYPE, device=DEVICE)
-    Sigma_x = torch.tensor(S_x_np_batch, dtype=DTYPE, device=DEVICE)
-
-    # Compute micro EI: (B_size,)
-    s_eff = (kappa ** 2) * (A @ Sigma_x @ A.transpose(-2, -1)) + Sigma_eps
-    logdet_eff = torch.linalg.slogdet(s_eff)[1]
-    logdet_eps = torch.linalg.slogdet(Sigma_eps)[1]
-    ei_micro = 0.5 * (logdet_eff - logdet_eps) / np.log(2.0)
-    micro_density = ei_micro / float(p)
-
-    best_cefi = torch.full((B_size,), -1e9, dtype=DTYPE, device=DEVICE)
-    best_q = torch.full((B_size,), 1, dtype=torch.int64, device=DEVICE)
-    best_macro_ei = torch.full((B_size,), -1e9, dtype=DTYPE, device=DEVICE)
-
-    # For each dimension q in candidates
-    for q in q_candidates:
-        best_obj_q = torch.full((B_size,), -1e9, dtype=DTYPE, device=DEVICE)
-        
-        for r in range(n_restarts):
-            # Deterministic/orthogonal initialization
-            # Start 0: PCA-based from Sigma_x
-            if r == 0:
-                eigvals, eigvecs = torch.linalg.eigh(Sigma_x)
-                W_init = eigvecs[:, :, -q:].transpose(-2, -1)
-            else:
-                torch.manual_seed(42 + r * 1000 + q * 17)
-                W_rand = torch.randn(B_size, q, p, dtype=DTYPE, device=DEVICE)
-                Q, _ = torch.linalg.qr(W_rand.transpose(-2, -1))
-                W_init = Q.transpose(-2, -1)[:, :q, :]
-
-            W = W_init.clone().requires_grad_(True)
-
-            for it in range(max_iter):
-                W_curr = W
-                A_M = W_curr @ A @ W_curr.transpose(-2, -1)
-                S_eps_M = W_curr @ Sigma_eps @ W_curr.transpose(-2, -1)
-                S_x_M = W_curr @ Sigma_x @ W_curr.transpose(-2, -1)
-
-                S_eff_M = (kappa ** 2) * (A_M @ S_x_M @ A_M.transpose(-2, -1)) + S_eps_M
-
-                ld_eff_M = torch.linalg.slogdet(S_eff_M)[1]
-                ld_eps_M = torch.linalg.slogdet(S_eps_M)[1]
-
-                obj = 0.5 * (ld_eff_M - ld_eps_M) / np.log(2.0)
-
-                grad_W = torch.autograd.grad(obj.sum(), W_curr)[0]
-
-                with torch.no_grad():
-                    grad_R = grad_W - W_curr @ grad_W.transpose(-2, -1) @ W_curr
-                    W_next = W_curr + 0.05 * grad_R
-                    Q_ret, _ = torch.linalg.qr(W_next.transpose(-2, -1))
-                    W_new = Q_ret.transpose(-2, -1)[:, :q, :]
-
-                W = W_new.clone().requires_grad_(True)
-
-            with torch.no_grad():
-                A_M = W @ A @ W.transpose(-2, -1)
-                S_eps_M = W @ Sigma_eps @ W.transpose(-2, -1)
-                S_x_M = W @ Sigma_x @ W.transpose(-2, -1)
-                S_eff_M = (kappa ** 2) * (A_M @ S_x_M @ A_M.transpose(-2, -1)) + S_eps_M
-                final_obj = 0.5 * (torch.linalg.slogdet(S_eff_M)[1] - torch.linalg.slogdet(S_eps_M)[1]) / np.log(2.0)
-                best_obj_q = torch.maximum(best_obj_q, final_obj)
-
-        cefi_q = (best_obj_q / float(q)) - micro_density
-        improved = cefi_q > best_cefi
-        best_cefi = torch.where(improved, cefi_q, best_cefi)
-        best_q = torch.where(improved, torch.full_like(best_q, q), best_q)
-        best_macro_ei = torch.where(improved, best_obj_q, best_macro_ei)
-
-    return (
-        best_cefi.cpu().numpy(),
-        best_q.cpu().numpy(),
-        ei_micro.cpu().numpy(),
-        best_macro_ei.cpu().numpy()
+    del p  # inferred and validated by the shared canonical implementation
+    cefi, q_star, ei_micro, macro_ei, _ = evaluate_batch_cefi(
+        A_np_batch,
+        S_eps_np_batch,
+        S_x_np_batch,
+        q_candidates,
+        n_restarts=n_restarts,
+        max_iter=max_iter,
+        kappa=kappa,
+        device=DEVICE,
+        search_dtype=torch.float64,
     )
+    return cefi, q_star, ei_micro, macro_ei
+
+
+# -----------------------------------------------------------------------------
+# PHASE 2: CANONICAL ROLLING SERIES ON GPU
+# -----------------------------------------------------------------------------
+def run_phase_2_cuda_rolling_series():
+    print("\n" + "=" * 90)
+    print(f"PHASE 2: COMPUTING CANONICAL ROLLING SERIES ON {DEVICE} (12/100)")
+    print("=" * 90)
+    df_returns = pd.read_csv("data/raw/ff30_daily_returns.csv", parse_dates=["Date"], index_col="Date")
+    window_length = 500
+    step = 2
+    p = df_returns.shape[1]
+    q_all = list(range(1, p))
+    end_points = list(range(window_length, len(df_returns) + 1, step))
+    dates = [df_returns.index[end - 1] for end in end_points]
+
+    A_all, S_eps_all, S_x_all = [], [], []
+    for end in end_points:
+        window = df_returns.iloc[end - window_length:end].to_numpy()
+        A, S_eps = fit_micro_var1(window)
+        A_all.append(A)
+        S_eps_all.append(S_eps)
+        S_x_all.append(np.cov(window, rowvar=False))
+
+    A_all = np.stack(A_all)
+    S_eps_all = np.stack(S_eps_all)
+    S_x_all = np.stack(S_x_all)
+    cefi_parts, q_parts, micro_parts, macro_parts = [], [], [], []
+    chunk_size = 512
+    for start in range(0, len(end_points), chunk_size):
+        stop = min(start + chunk_size, len(end_points))
+        cefi, q_star, ei_micro, macro_ei = evaluate_batch_cefi_cuda(
+            A_all[start:stop], S_eps_all[start:stop], S_x_all[start:stop],
+            p, q_all, n_restarts=N_RESTARTS, max_iter=MAX_ITER, kappa=KAPPA_DO,
+        )
+        cefi_parts.append(cefi)
+        q_parts.append(q_star)
+        micro_parts.append(ei_micro)
+        macro_parts.append(macro_ei)
+        print(f"  Rolling windows completed: {stop:,}/{len(end_points):,}", flush=True)
+
+    cefi = np.concatenate(cefi_parts)
+    q_star = np.concatenate(q_parts)
+    ei_micro = np.concatenate(micro_parts)
+    macro_ei = np.concatenate(macro_parts)
+    result = pd.DataFrame({
+        "date": dates,
+        "ei_micro": ei_micro,
+        "ei_micro_density": ei_micro / float(p),
+        "macro_ei_max": macro_ei,
+        "macro_ei_max_density": macro_ei / q_star,
+        "cefi": cefi,
+        "cefi_raw": macro_ei - ei_micro,
+        "q_star": q_star,
+        "optimizer_budget": "12/100",
+        "estimator_spec": ESTIMATOR_SPEC,
+        "estimator_sha256": estimator_fingerprint(),
+        "micro_var_sha256": _sha256("src/causal_emergence/micro_var.py"),
+        "data_sha256": _sha256("data/raw/ff30_daily_returns.csv"),
+    })
+    result.to_csv("data/features/cefi_series_12_100.csv", index=False)
+    result.to_csv("data/features/cefi_daily_series.csv", index=False)
+    result[["date", "q_star"]].to_csv("data/features/qstar_series_12_100.csv", index=False)
+    print(
+        f"Saved {len(result):,} canonical windows | mean CEFI={result['cefi'].mean():.4f} nats | "
+        f"modal q*={int(result['q_star'].mode().iloc[0])}",
+        flush=True,
+    )
+    return result
 
 
 # -----------------------------------------------------------------------------
 # PHASE 3: STRICT MATCHED NULL INFERENCE ON GPU (B=9,999)
 # -----------------------------------------------------------------------------
-def run_phase_3_cuda_matched_nulls():
+def run_phase_3_cuda_matched_nulls(regime_index=None):
     print("\n" + "=" * 90)
-    print(f"PHASE 3: RUNNING STRICT MATCHED NULL INFERENCE ON {DEVICE} ({torch.cuda.get_device_name(0)})")
+    device_name = torch.cuda.get_device_name(0) if DEVICE.type == "cuda" else "CPU"
+    print(f"PHASE 3: RUNNING STRICT MATCHED NULL INFERENCE ON {DEVICE} ({device_name})")
+    if regime_index is not None:
+        print(f"  Targeting Single Regime Index: {regime_index}")
     print("=" * 90)
-
-    if os.path.exists("reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS_12_100.csv") and os.path.exists("reports/tables/full_null_inference_summary.csv"):
-        df_exist = pd.read_csv("reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS_12_100.csv")
-        if len(df_exist) == 3:
-            print("Canonical null results already computed and verified! Skipping Phase 3 simulation.")
-            print(df_exist.to_string(index=False))
-            return df_exist
 
     df_returns = pd.read_csv("data/raw/ff30_daily_returns.csv", parse_dates=["Date"], index_col="Date")
     p = df_returns.shape[1]
@@ -157,15 +189,43 @@ def run_phase_3_cuda_matched_nulls():
         ("2008 GFC Peak", "2008-11-20"),
         ("2020 COVID Shock", "2020-03-23")
     ]
+    target_benchmarks = [benchmarks[regime_index]] if regime_index is not None else benchmarks
 
     B_primary = 9999
     B_aux = 999
-    chunk_size = 128
+    chunk_size = 512
+    provenance = _run_provenance(B_primary=B_primary, B_aux=B_aux)
+    run_fingerprint = hashlib.sha256(
+        json.dumps(provenance, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    provenance_path = "reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS_12_100.provenance.json"
+    primary_path = "reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS_12_100.csv"
+    full_path = "reports/tables/full_null_inference_summary.csv"
+    if regime_index is None and os.path.exists(primary_path) and os.path.exists(full_path) and os.path.exists(provenance_path):
+        with open(provenance_path, encoding="utf-8") as handle:
+            saved_manifest = json.load(handle)
+        df_exist = pd.read_csv(primary_path)
+        df_full_exist = pd.read_csv(full_path)
+        output_hashes = saved_manifest.get("outputs", {})
+        hashes_match = (
+            output_hashes.get(primary_path) == _sha256(primary_path)
+            and output_hashes.get(full_path) == _sha256(full_path)
+        )
+        if (
+            saved_manifest.get("run_config") == provenance
+            and hashes_match
+            and len(df_exist) == 3
+            and len(df_full_exist) == 12
+        ):
+            print("Verified matching null results and provenance; skipping Phase 3 simulation.")
+            print(df_exist.to_string(index=False))
+            return df_exist
+    print("No provenance-identical complete null run found; Phase 3 will be recomputed/resumed safely.")
 
     primary_records = []
     full_records = []
 
-    for label, end_date in benchmarks:
+    for label, end_date in target_benchmarks:
         end_loc = df_returns.index.get_indexer([pd.to_datetime(end_date)], method="nearest")[0]
         actual_date = df_returns.index[end_loc].strftime("%Y-%m-%d")
         window = df_returns.iloc[end_loc - 500 + 1 : end_loc + 1].values
@@ -189,10 +249,27 @@ def run_phase_3_cuda_matched_nulls():
         def _process_null_ensemble(null_type, B_total):
             print(f"  Evaluating {null_type} (B={B_total}, 12 restarts / 100 iters on GPU)...")
             t0 = time.time()
-            all_cefi_null = []
-            all_q_null = []
+            os.makedirs("reports/checkpoints", exist_ok=True)
+            safe_label = "".join(ch if ch.isalnum() else "_" for ch in label).strip("_")
+            checkpoint = (
+                f"reports/checkpoints/{safe_label}_{null_type}_B{B_total}_"
+                f"{ESTIMATOR_SPEC}_{run_fingerprint[:12]}.npz"
+            )
+            if os.path.exists(checkpoint):
+                saved = np.load(checkpoint)
+                all_cefi_null = saved["cefi"].tolist()
+                all_q_null = saved["q_star"].tolist()
+                if len(all_cefi_null) != len(all_q_null) or len(all_cefi_null) > B_total:
+                    print("    Invalid checkpoint dimensions; recomputing it.", flush=True)
+                    all_cefi_null = []
+                    all_q_null = []
+                else:
+                    print(f"    Resuming checkpoint at {len(all_cefi_null):,}/{B_total:,}", flush=True)
+            else:
+                all_cefi_null = []
+                all_q_null = []
 
-            for start_idx in range(0, B_total, chunk_size):
+            for start_idx in range(len(all_cefi_null), B_total, chunk_size):
                 curr_B = min(chunk_size, B_total - start_idx)
                 A_batch = []
                 S_eps_batch = []
@@ -230,6 +307,12 @@ def run_phase_3_cuda_matched_nulls():
                 )
                 all_cefi_null.extend(c_null)
                 all_q_null.extend(q_null)
+                np.savez_compressed(
+                    checkpoint,
+                    cefi=np.asarray(all_cefi_null),
+                    q_star=np.asarray(all_q_null, dtype=int),
+                )
+                print(f"    {null_type}: {len(all_cefi_null):,}/{B_total:,}", flush=True)
 
             elapsed = time.time() - t0
             null_cefi = np.array(all_cefi_null)
@@ -278,6 +361,10 @@ def run_phase_3_cuda_matched_nulls():
             {"Regime": label, "Null_Model": "H0_diag+contemp", "B": B_primary, "CEFI_obs": cefi_obs, "q_obs": q_obs, "Mean_0": m_dc, "Q95_0": q95_dc, "z_dev": z_dc, "p_raw": p_dc, "modal_q_0": mod_q_dc}
         ])
 
+    if regime_index is not None:
+        print(f"\nRegime [{benchmarks[regime_index][0]}] completed successfully with all checkpoints.")
+        return None
+
     # Holm-Bonferroni correction on primary family (m=6)
     p_values_primary = []
     for r in primary_records:
@@ -313,6 +400,16 @@ def run_phase_3_cuda_matched_nulls():
     df_primary.to_csv("reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS.csv", index=False)
     df_primary.to_csv("reports/tables/primary_null_inference_b9999.csv", index=False)
     df_full.to_csv("reports/tables/full_null_inference_summary.csv", index=False)
+    manifest = {
+        "run_config": provenance,
+        "run_fingerprint": run_fingerprint,
+        "outputs": {
+            primary_path: _sha256(primary_path),
+            full_path: _sha256(full_path),
+        },
+    }
+    with open(provenance_path, "w", encoding="utf-8") as handle:
+        json.dump(manifest, handle, indent=2, sort_keys=True)
 
     print("\n" + "=" * 90)
     print("CANONICAL 12/100 NULL RESULTS SUMMARY:")
@@ -331,12 +428,8 @@ def run_phase_4_econometrics():
 
     df_cefi = pd.read_csv("data/features/cefi_series_12_100.csv", parse_dates=["date"]).rename(columns={"date": "Date"}).set_index("Date")
 
-    episodes = {
-        "Dot-Com Crash": ("2000-03-01", "2002-10-09", "Valuation Repricing"),
-        "2008 GFC Peak": ("2007-10-01", "2009-03-31", "Systemic Liquidity"),
-        "2020 COVID Shock": ("2020-02-01", "2020-04-30", "Systemic Liquidity"),
-        "2022 Rate Tightening": ("2022-01-01", "2022-12-31", "Valuation Repricing")
-    }
+    from causal_emergence.episodes import get_episodes_tuples
+    episodes = get_episodes_tuples()
 
     df_cefi["is_liquidity"] = 0
     df_cefi["is_valuation"] = 0
@@ -354,7 +447,7 @@ def run_phase_4_econometrics():
         episode_records.append({
             "Episode": ep_name,
             "Type": ep_type,
-            "N_Days": len(sub),
+            "N_Windows": len(sub),
             "Mean_CEFI": sub["cefi"].mean(),
             "Median_CEFI": sub["cefi"].median(),
             "Modal_q": int(sub["q_star"].mode()[0]),
@@ -367,7 +460,7 @@ def run_phase_4_econometrics():
     episode_records.append({
         "Episode": "All Systemic Liquidity",
         "Type": "Pooled Liquidity",
-        "N_Days": len(sub_liq),
+        "N_Windows": len(sub_liq),
         "Mean_CEFI": sub_liq["cefi"].mean(),
         "Median_CEFI": sub_liq["cefi"].median(),
         "Modal_q": int(sub_liq["q_star"].mode()[0]),
@@ -376,7 +469,7 @@ def run_phase_4_econometrics():
     episode_records.append({
         "Episode": "All Valuation Repricing",
         "Type": "Pooled Valuation",
-        "N_Days": len(sub_val),
+        "N_Windows": len(sub_val),
         "Mean_CEFI": sub_val["cefi"].mean(),
         "Median_CEFI": sub_val["cefi"].median(),
         "Modal_q": int(sub_val["q_star"].mode()[0]),
@@ -485,6 +578,39 @@ def run_phase_4_econometrics():
         r2_bm = res_bm.rsquared * 100.0
         merged["cefi_res"] = res_bm.resid
 
+        # Multi-bandwidth HAC regressions for H4
+        h4_hac_lags = [20, 40, 60, 120, 250]
+        h4_records = []
+        name_map = {
+            "realized_vol": ("Realized Volatility", "RV"),
+            "avg_correlation": ("Average Correlation", r"\bar{\rho}"),
+            "effective_rank": ("Effective Rank", "ER"),
+            "diebold_yilmaz": ("Diebold-Yilmaz Index", "DY")
+        }
+        
+        models_by_lag = {L: sm.OLS(merged["cefi"], X_bm).fit(cov_type="HAC", cov_kwds={"maxlags": L}) for L in h4_hac_lags}
+        
+        for col in avail_cols:
+            idx = list(X_bm.columns).index(col)
+            pw_corr = float(np.corrcoef(merged["cefi"], merged[col])[0, 1])
+            disp_name, math_sym = name_map.get(col, (col, col))
+            row = {
+                "Variable": col,
+                "Display_Name": disp_name,
+                "Math_Symbol": math_sym,
+                "Pairwise_Corr": pw_corr,
+                "Beta": models_by_lag[40].params.iloc[idx],
+            }
+            for L in h4_hac_lags:
+                m = models_by_lag[L]
+                row[f"SE_L{L}"] = m.bse.iloc[idx]
+                row[f"t_L{L}"] = m.tvalues.iloc[idx]
+                row[f"p_L{L}"] = m.pvalues.iloc[idx]
+            h4_records.append(row)
+            
+        df_h4_sens = pd.DataFrame(h4_records)
+        df_h4_sens.to_csv("reports/tables/table_financial_benchmarks_h4_sensitivity.csv", index=False)
+
         res_ep_records = []
         for ep_name, (s_date, e_date, ep_type) in episodes.items():
             sub_res = merged.loc[(merged.index >= s_date) & (merged.index <= e_date), "cefi_res"]
@@ -497,6 +623,8 @@ def run_phase_4_econometrics():
         df_res_ep.to_csv("reports/tables/table_residualized_cefi_episodes.csv", index=False)
         print(f"\nConventional Benchmark Regression R2 = {r2_bm:.2f}% (Unexplained: {100.0 - r2_bm:.2f}%)")
         print(df_res_ep.to_string(index=False))
+        print("\nH4 HAC Sensitivity across bandwidths:")
+        print(df_h4_sens[["Display_Name", "Pairwise_Corr", "Beta", "t_L40", "t_L120", "t_L250", "p_L250"]].to_string(index=False))
 
     return df_episodes, df_hac, df_loo
 
@@ -508,6 +636,15 @@ def run_phase_5_cross_method_benchmarking():
     print("\n" + "=" * 90)
     print("PHASE 5: CROSS-METHOD BENCHMARKING (LIU 2024 & PRE 2025 SVD ON 870 SLICES)")
     print("=" * 90)
+
+    output_csv = "data/features/framework_comparison_series.csv"
+    summary_csv = "reports/tables/table_disaggregated_benchmarking.csv"
+    if os.path.exists(output_csv) and os.path.exists(summary_csv):
+        df_bench = pd.read_csv(output_csv, parse_dates=["date"]).set_index("date")
+        if len(df_bench) >= 800:
+            print(f"Verified framework comparison series already exists ({len(df_bench)} windows); skipping recomputation.")
+            bench_summary = pd.read_csv(summary_csv)
+            return bench_summary
 
     df_returns = pd.read_csv("data/raw/ff30_daily_returns.csv", parse_dates=["Date"], index_col="Date")
     W = 500
@@ -574,6 +711,8 @@ def run_phase_5_cross_method_benchmarking():
         })
 
     df_bench = pd.DataFrame(rows).set_index("date")
+    df_bench["estimator_spec"] = ESTIMATOR_SPEC
+    df_bench["estimator_sha256"] = estimator_fingerprint()
     df_bench.to_csv("data/features/framework_comparison_series.csv")
 
     p_liu = stats.pearsonr(df_bench["cefi_stiefel"], df_bench["cefi_liu2024"])[0]
@@ -611,7 +750,7 @@ def run_phase_8_and_14():
     fig, ax = plt.subplots(figsize=(12, 5), dpi=300)
     ax.plot(df_cefi.index, df_cefi["cefi"], color="#1f77b4", linewidth=1.2, label=r"$\mathrm{CEFI}_t$ (12 Restarts / 100 Iter)")
     ax.set_title("Causal Emergence Financial Index (1992–2026)", fontsize=13, fontweight="bold")
-    ax.set_ylabel(r"$\mathrm{CEFI}_t$ (Bits / Dimension)", fontsize=11)
+    ax.set_ylabel(r"$\mathrm{CEFI}_t$ (nats / dimension)", fontsize=11)
     ax.set_xlabel("Year", fontsize=11)
     ax.grid(True, linestyle="--", alpha=0.5)
     ax.legend(loc="upper left")
@@ -690,22 +829,42 @@ def run_phase_8_and_14():
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Master CUDA Production Pipeline (12/100)")
+    parser.add_argument(
+        "--phase",
+        type=str,
+        default="all",
+        choices=["all", "2", "3", "4", "5", "8", "finalize"],
+        help="Which phase to execute (all, 2, 3, 4, 5, 8, finalize)"
+    )
+    parser.add_argument(
+        "--regime",
+        type=int,
+        default=None,
+        choices=[0, 1, 2],
+        help="Specific benchmark regime for Phase 3 (0=Calm, 1=GFC, 2=COVID)"
+    )
+    args = parser.parse_args()
+
     print("=" * 90)
     print("STARTING MASTER CUDA PRODUCTION PIPELINE (12 RESTARTS / 100 ITERATIONS)")
+    print(f"Phase: {args.phase} | Regime: {args.regime}")
     print("=" * 90)
     t_start = time.time()
 
-    # Step 1: Matched Nulls on GPU
-    run_phase_3_cuda_matched_nulls()
+    if args.phase in ("all", "2"):
+        run_phase_2_cuda_rolling_series()
 
-    # Step 2: Downstream Econometrics
-    run_phase_4_econometrics()
+    if args.phase in ("all", "3"):
+        run_phase_3_cuda_matched_nulls(regime_index=args.regime)
 
-    # Step 3: Cross-Method Benchmarking
-    run_phase_5_cross_method_benchmarking()
-
-    # Step 4: Figures and Hostile Comparison
-    run_phase_8_and_14()
+    if args.phase in ("all", "finalize", "4"):
+        if args.phase == "finalize":
+            run_phase_3_cuda_matched_nulls(regime_index=None)
+        run_phase_4_econometrics()
+        run_phase_5_cross_method_benchmarking()
+        run_phase_8_and_14()
 
     total_time = time.time() - t_start
     print("\n" + "=" * 90)

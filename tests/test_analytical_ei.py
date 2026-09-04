@@ -1,8 +1,8 @@
 """
 Unit Tests for Scale-Invariant Analytical Continuous Causal Emergence Engine
 ===========================================================================
-Verifies exact scale-invariance, Stiefel manifold orthogonality, exact conditional
-Markov dynamics projection, emergence metrics, and published benchmarks (Liu et al. 2024, PRE 2025 SVD).
+Verifies exact scale-invariance, Stiefel manifold orthogonality, constructed
+macro dynamics, emergence metrics, and published benchmarks (Liu et al. 2024, PRE 2025 SVD).
 """
 
 import numpy as np
@@ -63,7 +63,7 @@ def test_stiefel_matrix_orthogonality():
 
 
 def test_macro_dynamics_exact_projection():
-    """Verify exact conditional Markov projection dimension and positive-definiteness."""
+    """Verify constructed macro-channel dimensions and positive-definiteness."""
     p, q = 6, 2
     A = 0.5 * np.eye(p)
     Sigma_eps = 0.8 * np.eye(p)
@@ -184,5 +184,28 @@ def test_deterministic_tie_breaking():
     macro_ei_dict = {1: 1.0, 2: 2.0, 3: 1.5, 4: 1.6}
     # q=1: 1.0/1 - 4/4 = 0.0, q=2: 2.0/2 - 4/4 = 0.0
     cefi, q_star, deltas, cefi_raw = compute_emergence_spectrum(ei_micro, macro_ei_dict, p_micro=4)
-    assert q_star in [1, 2]
+    assert q_star == 1
     assert np.isclose(cefi, 0.0)
+
+
+def test_near_tie_breaking_uses_global_maximum():
+    """The smallest q within epsilon of the global maximum must win."""
+    cefi, q_star, _, _ = compute_emergence_spectrum(
+        0.0, {1: 0.0, 2: 1.8e-7, 3: 3.3e-7}, p_micro=4
+    )
+    assert q_star == 2
+    assert np.isclose(cefi, 0.9e-7)
+
+
+def test_cpu_optimizer_is_repeatable():
+    A = np.array([[0.35, 0.1, 0.0], [0.0, 0.2, 0.08], [0.02, 0.0, 0.15]])
+    Sigma_eps = np.eye(3)
+    Sigma_x = np.diag([1.1, 0.9, 1.0])
+    first = optimize_coarse_graining_stiefel(
+        A, Sigma_eps, 1, Sigma_x=Sigma_x, n_restarts=3, max_iter=10
+    )
+    second = optimize_coarse_graining_stiefel(
+        A, Sigma_eps, 1, Sigma_x=Sigma_x, n_restarts=3, max_iter=10
+    )
+    np.testing.assert_allclose(first[0], second[0], rtol=0, atol=0)
+    assert first[1] == second[1]

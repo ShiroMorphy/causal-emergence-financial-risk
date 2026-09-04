@@ -1,29 +1,31 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# Master Pipeline Reproduction Script for:
-# "Causal Emergence in Financial Markets: Dynamic Organization and Effective
-#  Dimensionality During Systemic Stress"
-# Target Journal: International Review of Financial Analysis (IRFA)
-# ==============================================================================
+# Canonical end-to-end reproduction (isotropic constructed-macro estimator).
 
-set -e
+set -euo pipefail
 
-echo "=== [1/5] Running Complete Test Suite ==="
-PYTHONPATH=src python3 -m pytest tests/ -v
+echo "=== [1/6] Running tests and deterministic estimator preflight ==="
+PYTHONPATH=src python3 -m pytest tests/ -q
+PYTHONPATH=src python3 scripts/36_validate_canonical_cuda.py
 
-echo "=== [2/5] Running Master Pre-Submission Diagnostics Suite ==="
-PYTHONPATH=src python3 scripts/17_run_master_closure_diagnostics.py
+echo "=== [2/6] Computing canonical FF30 series, matched nulls, tables, and benchmarks ==="
+PYTHONPATH=src python3 scripts/33_run_canonical_cuda_production.py --phase finalize
 
-echo "=== [3/5] Generating Publication Figures & Tables ==="
-PYTHONPATH=src python3 scripts/14_generate_manuscript_figures.py
-PYTHONPATH=src python3 scripts/15_financial_benchmarks_h4.py
+echo "=== [3/6] Computing canonical robustness and FF49 replication ==="
+PYTHONPATH=src python3 scripts/34_rerun_all_robustness_12_100.py
 
-echo "=== [4/5] Compiling LaTeX Documents (Manuscript, Title Page, Appendix, Cover Letter) ==="
-pdflatex -interaction=nonstopmode manuscript.tex > /dev/null 2>&1
-pdflatex -interaction=nonstopmode Title_Page.tex > /dev/null 2>&1
-pdflatex -interaction=nonstopmode Supplementary_Appendix.tex > /dev/null 2>&1
-pdflatex -interaction=nonstopmode Cover_Letter.tex > /dev/null 2>&1
+echo "=== [4/6] Regenerating publication figures from provenance-checked results ==="
+PYTHONPATH=src python3 scripts/35_regenerate_all_publication_figures.py
 
-echo "========================================================================"
-echo "Reproduction Complete! All outputs generated in reports/ & PDFs compiled."
-echo "========================================================================"
+echo "=== [5/6] Verifying the complete numerical package ==="
+PYTHONPATH=src python3 scripts/37_verify_canonical_outputs.py
+
+echo "=== [6/7] Compiling submission documents ==="
+for document in manuscript Title_Page Supplementary_Appendix Cover_Letter; do
+    pdflatex -halt-on-error -interaction=nonstopmode "${document}.tex" >/dev/null
+    pdflatex -halt-on-error -interaction=nonstopmode "${document}.tex" >/dev/null
+done
+
+echo "=== [7/7] Running exhaustive PDF-level pre-submission audit ==="
+python3 scripts/29_exhaustive_consistency_audit.py
+
+echo "Canonical reproduction complete."

@@ -1,0 +1,4 @@
+Comparison,Pearson_rho,Spearman_rho
+q_star_vs_effective_rank,-0.07812816693314906,-0.06342303603142749
+q_star_vs_pca80_dimension,-0.09413681894276067,-0.07387184030927801
+q_star_vs_pca90_dimension,-0.11157556908991306,-0.0692413541848244

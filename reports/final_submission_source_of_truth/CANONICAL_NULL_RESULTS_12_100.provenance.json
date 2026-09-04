@@ -1,0 +1,24 @@
+{
+  "outputs": {
+    "reports/final_submission_source_of_truth/CANONICAL_NULL_RESULTS_12_100.csv": "c668ffd43b8869679c0cab0cbe878984d7b1c4c97fa656be844ce223cce714a3",
+    "reports/tables/full_null_inference_summary.csv": "8edd255f20cb478f60628857d089b27ea4a3491ce487c3f8fd43eb81cff211a0"
+  },
+  "run_config": {
+    "B_aux": 999,
+    "B_primary": 9999,
+    "data_sha256": "2ba1f734ad41d3a101596b3bc30c358c53da29e13c91f0b9fca8a8e17b0d8af9",
+    "estimator_sha256": "0552c7f4701ada91e31e916f992171b9418cb47d283a56e61f311581d66266cb",
+    "estimator_spec": "isotropic_constructed_macro_nats_full_precision_v3",
+    "fp64_refinement_steps": 0,
+    "kappa": 1.0,
+    "max_iter": 100,
+    "micro_var_sha256": "77c9d1c1d24671096343256cdb2bf0bf0d73a48506bf8c564ae47e0c267b4c59",
+    "n_restarts": 12,
+    "null_models_sha256": "e58a9a7848e3f646ea42e2511ddce12552807d26f46fd1284cfcad478f101b59",
+    "production_script_sha256": "087a78c3702e73f738fccb35595cd2e5c2f42444d98f289734f6103198a1503b",
+    "search_dtype": "float64",
+    "tie_tolerance": 1e-07,
+    "window_length": 500
+  },
+  "run_fingerprint": "a0e39e5908feef83497f6c5c7aa5feb2f82818c57489c817a7040d49db858804"
+}

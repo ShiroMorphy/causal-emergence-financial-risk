@@ -20,11 +20,6 @@ env/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-manuscript.tex
-manuscript.pdf
-Title_Page.tex
-Title_Page.pdf
-Highlights.txt
 elsarticle/
 elsarticle*
 

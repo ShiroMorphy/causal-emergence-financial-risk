@@ -1,15 +1,14 @@
 % Multi-Window Estimation Robustness (1992-2026)
-\begin{table}
-\caption{Estimation Window Robustness ($W = 500, 750, 1000$ days)}
+egin{table}
+\caption{Estimation Window Robustness ( \in \{500, 750, 1000\}$ Trading Days)}
 \label{tab:window_robustness}
-\begin{tabular}{llllll}
-\toprule
- & Pearson Corr vs W=500 & Spearman Corr vs W=500 & Modal q* & Mean CEFI & Std CEFI \\
-Window Length (W) &  &  &  &  &  \\
+egin{tabular}{ccccc}
+	oprule
+Window Length ($) & Mean CEFI & Spearman $\rho_S$ vs Baseline & Optimal Phase Lag ($\ell$) & Lagged Corr \
 \midrule
-500 trading days (~2y) & 1.000 & 1.000 & 3 & 0.864 & 0.363 \\
-750 trading days (~3y) & 0.767 & 0.726 & 3 & 0.794 & 0.369 \\
-1000 trading days (~4y) & 0.649 & 0.593 & 3 & 0.755 & 0.370 \\
-\bottomrule
+ = 500$ days (Baseline) & 0.2375 & 1.000 & 0 & 1.000 \
+ = 750$ days            & 0.1676 & 0.819 & -10 days & 0.793 \
+ = 1000$ days           & 0.1250 & 0.690 & -140 days & 0.680 \
+ottomrule
 \end{tabular}
 \end{table}

@@ -13,14 +13,19 @@
 \contentsline {section}{\numberline {5}VAR Stability and Spectral Radius Diagnostics}{8}{section.5}%
 \contentsline {section}{\numberline {6}VAR Dynamic Specification and Lag Adequacy Diagnostics}{8}{section.6}%
 \contentsline {section}{\numberline {7}Full Matched Null Hierarchy Simulation Protocol and Results}{9}{section.7}%
-\contentsline {section}{\numberline {8}Multiple-Testing Adjustments and Sensitivity Analysis}{9}{section.8}%
-\contentsline {section}{\numberline {9}Causal Effective Dimension ($q^*$) vs. Static Covariance Dimensionality}{9}{section.9}%
-\contentsline {section}{\numberline {10}Conventional Systemic Risk Benchmarks: Collinearity and Residualized CEFI}{10}{section.10}%
-\contentsline {subsection}{\numberline {10.1}Multicollinearity Diagnostics}{10}{subsection.10.1}%
-\contentsline {subsection}{\numberline {10.2}Residualized CEFI Analysis}{10}{subsection.10.2}%
-\contentsline {section}{\numberline {11}Event Study Regressions: Full HAC Lag Bandwidth Sensitivity}{11}{section.11}%
-\contentsline {section}{\numberline {12}Leave-One-Episode-Out Crisis Sensitivity Analysis}{11}{section.12}%
-\contentsline {section}{\numberline {13}Sensitivity to Intervention Scale Parameter $\kappa $}{12}{section.13}%
-\contentsline {section}{\numberline {14}Sensitivity to Rolling Window Length $W$}{12}{section.14}%
-\contentsline {section}{\numberline {15}Cross-Universe Robustness: Fama-French 49 Industry Cross-Section}{12}{section.15}%
-\contentsline {section}{\numberline {16}Computational Environment and Software Manifest}{13}{section.16}%
+\contentsline {subsection}{\numberline {7.1}Surrogate Generation and Estimation Protocol}{9}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Matched Null Inference Results}{10}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Multiple-Testing Adjustments and Sensitivity Analysis}{10}{section.8}%
+\contentsline {section}{\numberline {9}Causal Effective Dimension ($q^*$) vs. Static Covariance Dimensionality}{10}{section.9}%
+\contentsline {section}{\numberline {10}Conventional Systemic Risk Benchmarks: Collinearity and Residualized CEFI}{11}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Multicollinearity Diagnostics}{11}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Residualized CEFI Analysis}{11}{subsection.10.2}%
+\contentsline {section}{\numberline {11}Event Study Regressions: Full HAC Lag Bandwidth Sensitivity}{12}{section.11}%
+\contentsline {section}{\numberline {12}Leave-One-Episode-Out Crisis Sensitivity Analysis}{12}{section.12}%
+\contentsline {section}{\numberline {13}Sensitivity to Intervention Scale Parameter $\kappa $}{13}{section.13}%
+\contentsline {section}{\numberline {14}Sensitivity to Rolling Window Length $W$}{13}{section.14}%
+\contentsline {section}{\numberline {15}Cross-Partition and Industry-Granularity Sensitivity: Fama-French 49 Industry Portfolios}{13}{section.15}%
+\contentsline {section}{\numberline {16}Theoretical Cross-Method Benchmarking Formulations: Liu et al. (2024) and Liu et al. (2025)}{14}{section.16}%
+\contentsline {subsection}{\numberline {16.1}Liu et al. (2024) Exact Bounded-Uniform Theory}{14}{subsection.16.1}%
+\contentsline {subsection}{\numberline {16.2}Liu et al. (2025) Singular Value Decomposition (SVD) Formulation}{15}{subsection.16.2}%
+\contentsline {section}{\numberline {17}Computational Environment and Software Manifest}{15}{section.17}%

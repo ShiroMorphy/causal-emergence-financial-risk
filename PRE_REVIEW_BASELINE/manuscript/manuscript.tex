@@ -1,0 +1,569 @@
+\documentclass[review,12pt,authoryear]{elsarticle}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{microtype}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\journal{International Review of Financial Analysis}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Causal Emergence in Financial Markets: Dynamic Organization and Effective Dimensionality During Systemic Stress}
+
+\author{}
+
+\begin{abstract}
+This paper investigates whether multi-asset financial systems exhibit causal emergence, such that a macroscopic coarse-graining of the financial network contains higher effective transition information per degree of freedom than its microscopic constituent assets. Applying continuous-state information theory to 35 years of daily U.S. equity industry portfolio returns (1990--2026), we develop the Causal Emergence Financial Index ($\mathrm{CEFI}_t$) and estimate the Causal Effective Dimension ($q_t^*$) via Riemannian optimization on Stiefel manifolds. Benchmarking against a four-tier hierarchy of matched surrogate null models ($B=999$), we find that causal emergence is state- and episode-dependent. In the 2005 calm-market benchmark window, observed emergence is statistically indistinguishable from a null preserving own-lag persistence and contemporaneous innovation covariance ($p = 0.1000$). During systemic stress, $\mathrm{CEFI}_t$ exceeds static correlation benchmarks ($p < 0.05$). Furthermore, systemic liquidity and contagion crises exhibit lower causal effective dimensionality ($q^* \in \{2, 3\}$, modal $q^* = 2$) than valuation repricing episodes ($q^* \approx 5$, modal $q^* = 4$). In event-study regressions, $\mathrm{CEFI}_t$ is systematically higher during liquidity dislocations than during valuation repricing episodes ($\Delta \beta = +0.691$, Newey-West Wald $t = 4.65, p = 3.34 \times 10^{-6}$; stationary block-bootstrap 95\% CI: $[+0.510, +0.850]$). Across 870 historical rolling slices, the index achieves Pearson correlations of 0.837 and 0.832 with external continuous-emergence benchmarks. These results show that continuous causal emergence provides an informative measure of collective market organization during financial distress.
+\end{abstract}
+
+
+\begin{keyword}
+Causal Emergence \sep Systemic Risk \sep Effective Information \sep Stiefel Manifold \sep Dimensionality Concentration \sep Financial Networks
+\end{keyword}
+
+\end{frontmatter}
+
+\doublespacing
+
+\section{Introduction}
+\label{sec:intro}
+
+The transmission of distress across financial markets has traditionally been studied through the lens of contemporaneous co-movement, cross-sectional factor exposure, and inter-institutional connectedness \citep{billio2012econometric, diebold2012better, adrian2016covar, brownlees2017srisk}. During periods of severe market instability, asset returns frequently exhibit heightened cross-sectional correlation and variance concentration, phenomena commonly described as financial contagion or systemic fragility \citep{acharya2017measuring, kritzman2011principal}. However, while standard econometrics provides robust tools to measure contemporaneous covariance, volatility spillovers, and pairwise Granger causality, it generally does not address a deeper architectural question: does a distressed financial market develop emergent macroscopic dynamical organization, such that a coarse-grained representation of the network possesses greater effective transition information per degree of freedom than its underlying microscopic constituent assets?
+
+In the physics of complex systems and information theory, the formal framework of \emph{Causal Emergence} (CE), introduced by \citet{hoel2013quantifying} and extended by \citet{klein2020emergence} and \citet{rosas2020reconciling}, demonstrates that macroscopic representations of noisy or degenerate networks can exhibit higher \emph{Effective Information} ($EI$) than their microscopic descriptions. By grouping or projecting micro-level states onto an optimal lower-dimensional subspace, macro coarse-graining can average out idiosyncratic noise while concentrating intertemporal transition dynamics. Recent mathematical advances have established exact analytical formulations of causal emergence for continuous-state linear stochastic iterative systems \citep{liu2024exact, liu2025singular, yang2025finding}. 
+
+Despite these theoretical developments, causal emergence has not been systematically operationalized as a dynamic empirical measure of systemic financial risk. Financial markets represent a natural domain for continuous causal emergence: individual sector returns are characterized by substantial idiosyncratic volatility, common factor exposures, and intertemporal lead-lag relationships. When market conditions deteriorate into systemic liquidity or credit freezes, collective feedback loops may concentrate intertemporal dynamics into a low-dimensional macro-manifold, raising effective causal information relative to the noisy micro-system.
+
+This paper provides an empirical study of dynamic continuous causal emergence in equity markets across more than 35 years of daily data (1990--2026). We model the cross-section of industry portfolio returns through continuous-state linear Gaussian Vector Autoregressive transition models (VAR(1)). Using Riemannian gradient ascent on Stiefel manifolds, we optimize an orthogonal projection matrix $\mathbf{W} \in \mathcal{V}_q(\mathbb{R}^p)$ that maximizes macro effective information across all potential dimensions $q \in \{1, \dots, p-1\}$. We define two central statistics:
+\begin{enumerate}[label=(\roman*)]
+    \item The \emph{Causal Emergence Financial Index} ($\mathrm{CEFI}_t$), measuring the maximal causal information rate per degree of freedom gained through macroscopic coarse-graining:
+    \begin{equation}
+    \mathrm{CEFI}_t = \max_{1 \le q < p} \left[ \frac{EI_{q,t}^*}{q} - \frac{EI_{p,t}}{p} \right]
+    \end{equation}
+    \item The \emph{Causal Effective Dimension} ($q_t^*$), identifying the dimension at which macro causal concentration is maximized:
+    \begin{equation}
+    q_t^* = \arg\max_{1 \le q < p} \left[ \frac{EI_{q,t}^*}{q} - \frac{EI_{p,t}}{p} \right]
+    \end{equation}
+\end{enumerate}
+
+To ensure that the measure is invariant to arbitrary scaling of asset return units, we introduce a scale-invariant isotropic Gaussian intervention scaled by average channel energy, combined with an energy-scaled ridge regularizer. Crucially, because positive $\mathrm{CEFI}_t$ can arise mechanically under finite-sample optimization, we evaluate historical estimates against a four-tier hierarchy of matched surrogate null models ($B=999$), including a cross-lag network isolation null ($H_0^{\text{diag+contemp}}$) that preserves own-lag persistence and the full empirical contemporaneous innovation covariance matrix $\boldsymbol{\Sigma}_\varepsilon$.
+
+The empirical analysis delivers several main findings. First, causal emergence in financial markets is state- and episode-dependent. In the 2005 calm-market benchmark window, $\mathrm{CEFI}_t$ is statistically indistinguishable from surrogate benchmarks preserving own-lag persistence and contemporaneous covariance ($p = 0.1000$). In contrast, during the 2008 Global Financial Crisis (GFC) peak and the March 2020 COVID shock, observed $\mathrm{CEFI}_t$ significantly exceeds the static correlation mode benchmark ($p = 0.0170$ and $p = 0.0400$).
+
+Second, the data reveal nuanced differences across historical stress episodes. At the peak of the 2008 GFC, observed $\mathrm{CEFI}_t$ exceeds the cross-lag network isolation null ($p = 0.0240$), indicating significant off-diagonal dynamical organization. During the 2020 COVID crash, the cross-lag isolation null is not rejected ($p = 0.1150$), so the empirical return data do not require additional off-diagonal cross-lag coupling beyond own-lag persistence and contemporaneous innovation covariance.
+
+Third, in event-study regressions, $\mathrm{CEFI}_t$ responds differently across market stress types: it increases during systemic liquidity and contagion crises ($\beta_{\mathrm{Liq}} = +0.336, t = 4.54$) while remaining negative during macro-valuation repricing episodes such as the 2000 Dot-Com crash and the 2022 rate tightening cycle ($\beta_{\mathrm{Val}} = -0.355, t = -4.82$). This difference ($\Delta \beta = +0.691$) remains statistically significant across Newey-West lag bandwidths from 20 to 250 trading days (Wald $t = 4.65, p = 3.34 \times 10^{-6}$; stationary block-bootstrap 95\% CI: $[+0.510, +0.850]$).
+
+Fourth, systemic liquidity crises exhibit a lower causal effective dimensionality ($q^* \in \{2, 3\}$, modal $q^* = 2$, with 80.8\% of days having $q^* \le 4$) than valuation repricing episodes ($q^* \approx 5$, modal $q^* = 4$, with only 48.9\% having $q^* \le 4$).
+
+Fifth, our Riemannian Stiefel framework exhibits strong concordance across 870 historical rolling windows with independent theoretical benchmarks, including the exact continuous formulation of \citet{liu2024exact} (Pearson $\rho = 0.837$) and the analytical singular value decomposition approach of \citet{liu2025singular} ($\rho = 0.832$, with 88.7\% dimensional agreement within $\pm 1$). The low-dimensional structure replicates on the 49 Fama-French industry cross-section ($p=49$), yielding modal $q^* = 3$.
+
+The remainder of the paper is organized as follows. Section \ref{sec:literature} reviews the related literature. Section \ref{sec:methodology} presents the mathematical methodology. Section \ref{sec:data} describes the data and matched null model hierarchy. Section \ref{sec:results} reports the empirical findings. Section \ref{sec:robustness} provides theoretical validation and robustness checks. Section \ref{sec:discussion} discusses economic interpretations. Section \ref{sec:limitations} outlines limitations, and Section \ref{sec:conclusion} concludes.
+
+\section{Related Literature and Conceptual Foundations}
+\label{sec:literature}
+
+\subsection{Systemic Risk and Financial Connectedness}
+Our work relates to the econometric literature on systemic financial risk and market connectedness. Seminal contributions in this field include the CoVaR measure of conditional tail risk \citep{adrian2016covar}, Marginal Expected Shortfall and SRISK \citep{acharya2017measuring, brownlees2017srisk}, and principal component absorption ratios \citep{kritzman2011principal}. In parallel, network econometric models have focused on directional spillover indices based on Vector Autoregressive forecast error variance decompositions \citep{diebold2012better, diebold2014network} and Granger-causality network topologies \citep{billio2012econometric}.
+
+While these frameworks effectively quantify contemporaneous co-movement, tail dependence, or pairwise linear transmission, they evaluate financial dynamics strictly at the observed microscopic resolution. They do not examine whether a macroscopic aggregation of the system can exhibit higher deterministic causal structure than the underlying portfolio components.
+
+\subsection{Information Theory, Entropy, and Dimensionality in Finance}
+Information-theoretic concepts have a rich history in quantitative finance. Non-parametric measures such as Shannon entropy, transfer entropy, and mutual information have been applied to detect non-linear information flows and directional spillovers across international equity markets \citep{schreiber2000measuring, dimpfl2013using}. Spectral measures of effective dimensionality, such as the effective rank of a covariance matrix \citep{roy2007effective}, have been employed to quantify market concentration during crises.
+
+However, existing spectral dimensionality metrics (e.g., effective rank or PCA variance shares) depend exclusively on the static contemporaneous covariance matrix $\boldsymbol{\Sigma}_x$. They do not incorporate intertemporal transition dynamics ($\mathbf{A}$) or innovation noise covariance ($\boldsymbol{\Sigma}_\varepsilon$). In contrast, the Causal Effective Dimension ($q_t^*$) developed in this paper incorporates transition mechanics and innovation uncertainty simultaneously under an intervention framework.
+
+\subsection{Causal Emergence in Complex Dynamical Systems}
+The theory of causal emergence originated in discrete Markov chains to formalize how coarse-grained macroscopic states can reduce degeneracy and noise \citep{hoel2013quantifying, hoel2017when, klein2020emergence}. \citet{rosas2020reconciling} unified causal emergence with partial information decomposition, distinguishing between downward causation and synergistic emergence.
+
+Recent mathematical physics research has extended causal emergence to continuous-state stochastic dynamical systems. \citet{liu2024exact} derived exact continuous effective information and emergence conditions for linear stochastic systems under uniform bounded interventions. \citet{liu2025singular} developed an analytical singular value decomposition (SVD) perspective for Gaussian iterative dynamics, demonstrating equivalence conditions between SVD-based and EI-based emergence. \citet{yang2025finding} formulated machine learning architectures to discover emergence from observational data. Our paper builds on these continuous-state foundations, adapting them to empirical financial econometrics and rolling-window risk monitoring.
+
+\section{Mathematical Methodology}
+\label{sec:methodology}
+
+\subsection{Reduced-Form Linear Continuous-State Markov Dynamics}
+Let $\mathbf{x}_t = (x_{1,t}, x_{2,t}, \dots, x_{p,t})^\top \in \mathbb{R}^p$ denote a $p$-dimensional vector of daily portfolio returns. We model the transition dynamics via a continuous-state first-order Vector Autoregression, $\text{VAR}(1)$:
+\begin{equation}
+\mathbf{x}_{t+1} = \mathbf{A}\mathbf{x}_t + \boldsymbol{\varepsilon}_{t+1}, \qquad \boldsymbol{\varepsilon}_{t+1} \sim \mathcal{N}(\mathbf{0}, \boldsymbol{\Sigma}_\varepsilon)
+\label{eq:var1_model}
+\end{equation}
+where $\mathbf{A} \in \mathbb{R}^{p \times p}$ is the transition matrix, and $\boldsymbol{\varepsilon}_{t+1}$ is a vector of Gaussian innovations with positive-definite covariance matrix $\boldsymbol{\Sigma}_\varepsilon \in \mathbb{R}^{p \times p}$. 
+
+To guarantee strict scale invariance and prevent overfitting in finite rolling estimation windows, $\mathbf{A}$ is estimated via trace-scaled ridge regression:
+\begin{equation}
+\hat{\mathbf{A}} = \left( \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lag}} + \lambda_t \mathbf{I}_p \right)^{-1} \mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lead}}, \qquad \lambda_t = \lambda_0 \cdot \frac{\operatorname{Tr}(\mathbf{X}_{\text{lag}}^\top \mathbf{X}_{\text{lag}})}{p}
+\label{eq:scaled_ridge}
+\end{equation}
+with baseline parameter $\lambda_0 = 10^{-4}$. Scaling the ridge penalty proportionally to the empirical trace of the Gram matrix ensures that $\hat{\mathbf{A}}$ is invariant under arbitrary rescalings of return units ($\mathbf{X} \to c\mathbf{X}$). The residual covariance matrix $\boldsymbol{\Sigma}_\varepsilon$ is estimated using Ledoit-Wolf analytical shrinkage \citep{ledoit2004well}, which preserves scale equivariance ($\boldsymbol{\Sigma}_\varepsilon \to c^2 \boldsymbol{\Sigma}_\varepsilon$). The unconditional covariance matrix of the state vector is denoted by $\boldsymbol{\Sigma}_x = \operatorname{Cov}(\mathbf{x}_t)$.
+
+\paragraph{Delimitation of Causal Terminology.}
+The term \emph{causal} is used throughout this paper in the intervention-based information-theoretic sense of Effective Information conditional on the estimated stochastic transition operator \citep{hoel2013quantifying, liu2024exact}. It should not be interpreted as structural economic causality in the sense of Structural VAR (SVAR) identification, instrumental variables, potential outcomes, or Pearlian structural causal DAGs. The estimated VAR transition matrix $\mathbf{A}$ provides a reduced-form dynamical representation of market co-movements upon which counterfactual isotropic Gaussian intervention distributions are evaluated.
+
+\subsection{Isotropic Scale-Invariant Gaussian Interventions and Effective Information}
+Effective Information ($EI$) quantifies the mutual information between an intervened state $do(\mathbf{x}_t)$ and the subsequent state $\mathbf{x}_{t+1}$ \citep{hoel2013quantifying}:
+\begin{equation}
+EI(\mathbf{x}) = I(do(\mathbf{x}_t); \mathbf{x}_{t+1}) = H(\mathbf{x}_{t+1} \mid do) - H(\mathbf{x}_{t+1} \mid \mathbf{x}_t)
+\label{eq:ei_def_eq}
+\end{equation}
+Under Gaussian transition dynamics, the conditional entropy is given by $H(\mathbf{x}_{t+1} \mid \mathbf{x}_t) = \frac{p}{2}\ln(2\pi e) + \frac{1}{2}\ln\det(\boldsymbol{\Sigma}_\varepsilon)$.
+
+To evaluate interventional causality independently of observational factor orientations, we apply an isotropic Gaussian intervention $do(\mathbf{x}_t) \sim \mathcal{N}(\mathbf{0}, \sigma_{do,t}^2 \mathbf{I}_p)$. Conditional on a fixed isotropic covariance, the Gaussian distribution maximizes differential entropy. To ensure that $EI$ is strictly invariant to the choice of return scaling units (e.g., decimal returns vs. percentage returns), we set the intervention variance proportionally to the average channel energy:
+\begin{equation}
+\sigma_{do,t}^2 = \kappa^2 \cdot \frac{\operatorname{Tr}(\boldsymbol{\Sigma}_{x,t})}{p}
+\label{eq:scale_inv_def}
+\end{equation}
+where $\kappa > 0$ is a dimensionless scale parameter ($\kappa = 1.0$ by default). Under this intervention, $\mathbf{x}_{t+1} \mid do \sim \mathcal{N}(\mathbf{0}, \sigma_{do,t}^2 \mathbf{A}\mathbf{A}^\top + \boldsymbol{\Sigma}_\varepsilon)$. Applying Sylvester's determinant theorem yields the closed-form continuous Effective Information:
+\begin{equation}
+EI_{\text{micro}}(\mathbf{x}) = \frac{1}{2} \ln \det\left( \mathbf{I}_p + \sigma_{do,t}^2 \mathbf{A}\mathbf{A}^\top \boldsymbol{\Sigma}_\varepsilon^{-1} \right)
+\label{eq:ei_micro_closed}
+\end{equation}
+
+\subsection{Macro Coarse-Graining and Stiefel Manifold Optimization}
+We define a linear coarse-graining mapping from the $p$-dimensional micro-system to a $q$-dimensional macro-system ($q < p$) via an orthogonal projection matrix $\mathbf{W} \in \mathbb{R}^{q \times p}$:
+\begin{equation}
+\mathbf{y}_t = \mathbf{W}\mathbf{x}_t, \qquad \mathbf{W}\mathbf{W}^\top = \mathbf{I}_q
+\end{equation}
+The matrix $\mathbf{W}$ resides on the Stiefel manifold $\mathcal{V}_q(\mathbb{R}^p) = \{ \mathbf{W} \in \mathbb{R}^{q \times p} : \mathbf{W}\mathbf{W}^\top = \mathbf{I}_q \}$. Following \citet{liu2024exact} and \citet{liu2025singular}, the induced macro-dynamics follow:
+\begin{equation}
+\mathbf{y}_{t+1} = \mathbf{A}_M \mathbf{y}_t + \boldsymbol{\varepsilon}_{M, t+1}, \qquad \mathbf{A}_M = \mathbf{W}\mathbf{A}\mathbf{W}^\top, \quad \boldsymbol{\Sigma}_M = \mathbf{W}\boldsymbol{\Sigma}_\varepsilon \mathbf{W}^\top
+\label{eq:macro_dynamics_def}
+\end{equation}
+The macro Effective Information is:
+\begin{equation}
+EI_q(\mathbf{W}) = \frac{1}{2} \ln \det\left( \mathbf{I}_q + \sigma_{do,t}^2 (\mathbf{W}\mathbf{A}\mathbf{W}^\top)(\mathbf{W}\mathbf{A}\mathbf{W}^\top)^\top (\mathbf{W}\boldsymbol{\Sigma}_\varepsilon \mathbf{W}^\top)^{-1} \right)
+\label{eq:ei_macro_closed}
+\end{equation}
+
+The optimal macro-representation $\mathbf{W}_q^* = \arg\max_{\mathbf{W} \in \mathcal{V}_q(\mathbb{R}^p)} EI_q(\mathbf{W})$ is obtained via Riemannian gradient ascent \citep{edelman1998geometry, absil2008optimization}. Under the canonical metric on $T_{\mathbf{W}}\mathcal{V}_q(\mathbb{R}^p)$, the Riemannian gradient is:
+\begin{equation}
+\operatorname{grad}_{\mathcal{R}} EI_q(\mathbf{W}) = \mathbf{G} - \mathbf{W}\mathbf{G}^\top \mathbf{W}
+\end{equation}
+where $\mathbf{G} = \nabla_{\mathbf{W}} EI_q(\mathbf{W})$ is the Euclidean gradient obtained via automatic differentiation. Updates are mapped back to the Stiefel manifold using a QR-based retraction:
+\begin{equation}
+\mathbf{W}^{(k+1)} = \operatorname{Retr}\left( \mathbf{W}^{(k)} + \eta \operatorname{grad}_{\mathcal{R}} EI_q(\mathbf{W}^{(k)}) \right) = \mathbf{Q}^\top, \quad \mathbf{Q}\mathbf{R} = \left(\mathbf{W}^{(k)} + \eta \operatorname{grad}_{\mathcal{R}} EI\right)^\top
+\end{equation}
+where $\eta = 0.05$ is the step size. We execute 35 gradient iterations across four deterministic multistart initializations (including PCA projection and deterministic orthogonal random bases) and retain the solution with the highest objective value across the restarts.
+
+\subsection{Causal Emergence Financial Index and Effective Dimension}
+Because continuous $EI$ scales with state dimension, comparisons across dimensions evaluate the \emph{information rate per degree of freedom} \citep{liu2024exact}:
+\begin{equation}
+\mathrm{CEFI}_t = \max_{1 \le q < p} \left[ \frac{EI_{q,t}^*}{q} - \frac{EI_{p,t}}{p} \right]
+\label{eq:cefi_def}
+\end{equation}
+\begin{equation}
+q_t^* = \arg\max_{1 \le q < p} \left[ \frac{EI_{q,t}^*}{q} - \frac{EI_{p,t}}{p} \right]
+\label{eq:q_star_def}
+\end{equation}
+When $\mathrm{CEFI}_t > 0$, the macro-system exhibits higher causal density than the micro-system. $q_t^*$ identifies the scale of maximal causal concentration.
+
+\section{Data and Empirical Design}
+\label{sec:data}
+
+\subsection{Equity Portfolio Datasets}
+Our empirical analysis uses daily value-weighted portfolio returns from the Kenneth French Data Library. The primary dataset consists of the 30 Industry Portfolios (FF30) from January 1990 to June 2026 ($T = 9,190$ trading days, $p = 30$). To evaluate robustness across cross-sectional dimensions, we replicate the pipeline on the 49 Industry Portfolios (FF49, $p=49$).
+
+\subsection{Rolling Estimation Protocol}
+We employ rolling estimation windows of $W = 500$ trading days ($\sim 2$ years), stepping by 2 trading days across the 1992--2026 period ($N = 4,346$ rolling parameter estimates). At each step $t$, the trailing window $X_{t-W+1:t}$ is used to estimate $\mathbf{A}_t$, $\boldsymbol{\Sigma}_{\varepsilon,t}$, and $\boldsymbol{\Sigma}_{x,t}$, and solve the Stiefel optimization problem for all $q \in \{1, \dots, p-1\}$.
+
+\subsection{Benchmark Historical Episodes}
+To examine whether $\mathrm{CEFI}_t$ behaves differently across market environments, we identify four major market stress episodes:
+\begin{enumerate}
+    \item \textbf{2008 Global Financial Crisis (GFC)}: October 1, 2007 to June 30, 2009 (systemic banking contagion and credit freeze).
+    \item \textbf{2020 COVID Shock}: February 1, 2020 to May 31, 2020 (simultaneous global market crash and liquidity squeeze).
+    \item \textbf{2000 Dot-Com Crash}: March 1, 2000 to October 31, 2002 (valuation bubble collapse concentrated in technology and telecom).
+    \item \textbf{2022 Rate Tightening}: January 1, 2022 to November 30, 2022 (macro-monetary discount rate repricing).
+\end{enumerate}
+Episodes (1) and (2) represent systemic liquidity and contagion crises, whereas (3) and (4) represent broad valuation and rate repricing shocks.
+
+\subsection{Hierarchy of Four Matched Surrogate Null Models}
+To assess whether empirical $\mathrm{CEFI}_t$ reflects dynamic structure rather than finite-sample optimization artifacts, we evaluate four surrogate null models:
+\begin{enumerate}
+    \item \textbf{$H_0^{\text{circ}}$ (Circular Shift Null)}: Circularly shifts each asset column independently by random lags. Preserves marginal autocorrelation and variance, destroys cross-correlations and cross-lags.
+    \item \textbf{$H_0^{\text{diag}}$ (Decoupled Diagonal VAR Null)}: Simulates an uncoupled VAR(1) with $\mathbf{D} = \operatorname{diag}(\mathbf{A})$ and $\boldsymbol{\Sigma}_{\text{diag}} = \operatorname{diag}(\boldsymbol{\Sigma}_\varepsilon)$.
+    \item \textbf{$H_0^{\text{static}}$ (Static Correlation Mode Null)}: Synchronously permutes time steps across all assets. Preserves the exact contemporaneous covariance $\boldsymbol{\Sigma}_x$, but destroys intertemporal causality $\mathbf{x}_t \to \mathbf{x}_{t+1}$.
+    \item \textbf{$H_0^{\text{diag+contemp}}$ (Cross-Lag Network Isolation Null)}: Simulates $\mathbf{x}_{t+1} = \operatorname{diag}(\mathbf{A})\mathbf{x}_t + \boldsymbol{\varepsilon}_{t+1}$ with the full empirical contemporaneous covariance $\boldsymbol{\Sigma}_\varepsilon$. Preserves univariate persistence and contemporaneous shock covariance, destroying only off-diagonal cross-lag couplings ($A_{ij} = 0, i \neq j$).
+\end{enumerate}
+For each regime, the observed statistic $\mathrm{CEFI}_{\text{obs}}$ is computed once with deterministic initialization across all $q \in \{1, \dots, p-1\}$ and compared against $B=999$ surrogate realizations. Empirical $p$-values are computed as $p_{\text{emp}} = (1 + \sum_{b=1}^B \mathbb{I}(CEFI_b^{\text{null}} \ge CEFI_{\text{obs}}))/(B + 1)$.
+
+\section{Empirical Results}
+\label{sec:results}
+
+\subsection{Is Causal Emergence State-Dependent? Evidence from Matched Null Models}
+Table \ref{tab:null_models} reports the statistical inference across calm and crisis episodes under $B=999$ surrogate replications.
+
+\begin{table}[htbp]
+\centering
+\caption{Inference on Causal Emergence Across 4 Matched Null Models ($B=999$, $q \in 1..29$)}
+\label{tab:null_models}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Market Regime} & \textbf{Null Model} & $\mathbf{CEFI_{\text{obs}}}$ & $\mathbb{E}[\mathbf{CEFI_0}]$ & $\mathbf{Q_{95}}$ & $\mathbf{z_{\text{dev}}}$ & $\mathbf{p_{\text{emp}}}$ & \textbf{Modal } $\mathbf{q_0^*}$ \\
+\midrule
+\textbf{Calm Period (2005)} 
+ & $H_0^{\text{circ}}$ (Circular) & 1.0545 & +0.0449 & +0.0856 & +34.36 & 0.0010 & 28 \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 1.0545 & +0.0256 & +0.0331 & +235.05 & 0.0010 & 29 \\
+ & $H_0^{\text{static}}$ (Static Mode) & 1.0545 & +0.7595 & +1.0220 & +2.11 & 0.0380 & 3 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 1.0545 & +0.8892 & +1.0958 & +1.36 & 0.1000 & 4 \\
+\midrule
+\textbf{2008 GFC Peak} 
+ & $H_0^{\text{circ}}$ (Circular) & 1.7053 & +0.0547 & +0.1378 & +33.46 & 0.0010 & 29 \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 1.7053 & +0.0230 & +0.0298 & +357.03 & 0.0010 & 29 \\
+ & $H_0^{\text{static}}$ (Static Mode) & 1.7053 & +1.2169 & +1.5620 & +2.82 & 0.0170 & 4 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 1.7053 & +1.4441 & +1.6671 & +2.06 & 0.0240 & 3 \\
+\midrule
+\textbf{2020 COVID Shock} 
+ & $H_0^{\text{circ}}$ (Circular) & 1.4477 & +0.0307 & +0.0853 & +53.33 & 0.0010 & 29 \\
+ & $H_0^{\text{diag}}$ (VAR Diag) & 1.4477 & +0.0059 & +0.0093 & +662.86 & 0.0010 & 29 \\
+ & $H_0^{\text{static}}$ (Static Mode) & 1.4477 & +0.9921 & +1.4143 & +2.21 & 0.0400 & 2 \\
+ & $H_0^{\text{diag+contemp}}$ (Cross-lag Isol.) & 1.4477 & +1.2930 & +1.4816 & +1.25 & 0.1150 & 3 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{reports/figures/figure1_cefi_dynamics.pdf}
+\caption{Historical dynamics of the Causal Emergence Financial Index ($\mathrm{CEFI}_t$, 1992--2026). Shaded areas indicate historical benchmark stress episodes.}
+\label{fig:cefi_dynamics}
+\end{figure}
+
+The results in Table \ref{tab:null_models} and Figure \ref{fig:cefi_dynamics} show that:
+\begin{enumerate}
+    \item During the 2005 calm-market benchmark window, we cannot reject the cross-lag isolation null ($p_{\text{emp}} = 0.1000$). The observed $\mathrm{CEFI}_t$ is consistent with univariate persistence and contemporaneous shock covariance.
+    \item During the 2008 GFC peak, observed $\mathrm{CEFI}_t$ exceeds both the static correlation mode null ($p_{\text{emp}} = 0.0170$) and the cross-lag isolation null ($p_{\text{emp}} = 0.0240$).
+    \item During the 2020 COVID shock, observed $\mathrm{CEFI}_t$ exceeds the static correlation mode null ($p_{\text{emp}} = 0.0400$), while the cross-lag isolation null is not rejected ($p_{\text{emp}} = 0.1150$).
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{reports/figures/figure3_null_distributions.pdf}
+\caption{Observed $\mathrm{CEFI}_{\text{obs}}$ (red vertical line) compared against empirical distributions of $H_0^{\text{static}}$ and $H_0^{\text{diag+contemp}}$ across market regimes ($B=999$).}
+\label{fig:null_dist}
+\end{figure}
+
+\subsection{Response Across Crisis Types: Liquidity/Contagion vs. Valuation Repricing}
+To examine whether $\mathrm{CEFI}_t$ responds differently across crisis categories, we estimate the event-study specification:
+\begin{equation}
+\mathrm{CEFI}_t = \alpha + \beta_{\text{Liq}} D_t^{\text{Liquidity}} + \beta_{\text{Val}} D_t^{\text{Valuation}} + u_t
+\label{eq:h2_reg_spec}
+\end{equation}
+where $D_t^{\text{Liquidity}} = 1$ during the 2008 GFC and March 2020 COVID crash, and $D_t^{\text{Valuation}} = 1$ during the 2000 Dot-Com crash and the 2022 rate tightening cycle.
+
+\begin{table}[htbp]
+\centering
+\caption{Event Study Regressions: Sensitivity Across HAC Lag Bandwidths ($L = 20, 40, 60, 120, 250$)}
+\label{tab:h2_hac}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cccccccc}
+\toprule
+\textbf{HAC Lag ($L$)} & $\mathbf{\beta_{\text{Liq}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\beta_{\text{Val}}}$ & $\mathbf{t\text{-stat}}$ & $\mathbf{\Delta \beta}$ & \textbf{Wald } $\mathbf{t\text{-stat}}$ & \textbf{Wald } $\mathbf{p\text{-val}}$ \\
+\midrule
+$L = 20$  & +0.336 & +5.50 & -0.355 & -6.30 & +0.691 & +8.31 & $1.11 \times 10^{-16}$ \\
+$L = 40$  & +0.336 & +4.54 & -0.355 & -4.82 & +0.691 & +6.62 & $4.02 \times 10^{-11}$ \\
+$L = 60$  & +0.336 & +4.07 & -0.355 & -4.15 & +0.691 & +5.81 & $6.57 \times 10^{-09}$ \\
+$L = 120$ & +0.336 & +3.64 & -0.355 & -3.28 & +0.691 & +4.85 & $1.25 \times 10^{-06}$ \\
+$L = 250$ & +0.336 & +4.04 & -0.355 & -2.89 & +0.691 & +4.65 & $3.34 \times 10^{-06}$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Table \ref{tab:h2_hac} shows that $\beta_{\text{Liq}} = +0.336$ is positive across all lag bandwidths, while $\beta_{\text{Val}} = -0.355$ is negative. The estimated difference $\Delta \beta = +0.691$ is statistically significant under Newey-West standard errors up to $L=250$ (Wald $t = 4.65, p = 3.34 \times 10^{-6}$) and under a stationary block bootstrap \citep{politis1994stationary} with 1,000 replications (95\% CI: $[+0.510, +0.850]$). Within the four benchmark episodes analyzed, $\mathrm{CEFI}_t$ was higher during liquidity and contagion dislocations than during valuation repricing episodes.
+
+\subsection{Behavior of Causal Effective Dimensionality Across Market Regimes}
+Table \ref{tab:h3_collapse} and Figure \ref{fig:qstar_dynamics} report the distribution of $q_t^*$.
+
+\begin{table}[htbp]
+\centering
+\caption{Distribution of Causal Effective Dimension ($q^*$) Across Market Regimes}
+\label{tab:h3_collapse}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Market Regime} & \textbf{Obs} & \textbf{Median } $\mathbf{q^*}$ & \textbf{Mean } $\mathbf{q^*}$ & \textbf{Modal } $\mathbf{q^*}$ & $\mathbf{P(q^* \le 3)}$ & $\mathbf{P(q^* \le 4)}$ \\
+\midrule
+Normal / Calm Regimes                     & 3,635 & 3 & 3.45 & 3 & 59.8\% & 79.2\% \\
+Liquidity / Contagion Crises (GFC, COVID) & 261   & 3 & 3.37 & \textbf{2} & 53.3\% & \textbf{80.8\%} \\
+Valuation / Repricing Shocks (Dot-Com, 2022) & 450 & 5 & 4.86 & 4 & 30.4\% & 48.9\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{reports/figures/figure2_qstar_dynamics.pdf}
+\caption{Dynamic evolution of the Causal Effective Dimension ($q_t^*$). Shaded areas indicate historical stress episodes.}
+\label{fig:qstar_dynamics}
+\end{figure}
+
+During liquidity crises, 80.8\% of observations exhibit $q^* \le 4$ with modal $q^* = 2$, compared to valuation repricing episodes where modal dimension is $q^* = 4$ (mean $q^* = 4.86$, with only 48.9\% exhibiting $q^* \le 4$). Normal regimes exhibit a median of 3 and mean of 3.45.
+
+\subsection{Linear Association with Conventional Systemic Risk Metrics}
+To evaluate the relationship between $\mathrm{CEFI}_t$ and standard market metrics, we estimate:
+\begin{equation}
+\mathrm{CEFI}_t = \alpha + \beta_1 RV_t + \beta_2 \bar{\rho}_t + \beta_3 ER_t + \beta_4 DY_t + u_t
+\end{equation}
+where $RV_t$ is annualized realized volatility, $\bar{\rho}_t$ is average pairwise correlation, $ER_t = \exp(-\sum_i p_i \ln p_i)$ is effective rank \citep{roy2007effective}, and $DY_t$ is Diebold-Yilmaz total connectedness \citep{diebold2012better} (see Appendix A for formal constructions).
+
+\begin{table}[htbp]
+\centering
+\caption{Linear Association Between $\mathrm{CEFI}_t$ and Conventional Systemic Risk Benchmarks (HAC Newey-West $L=40$)}
+\label{tab:benchmarks_h4}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Benchmark Proxy} & \textbf{Pairwise Corr} & \textbf{Multivariate } $\mathbf{\beta}$ & \textbf{HAC SE} & $\mathbf{t\text{-stat}}$ & $\mathbf{p\text{-val}}$ \\
+\midrule
+Realized Volatility ($RV$)          & +0.628 & +1.0623 & (0.2359) & +4.50 & $6.67 \times 10^{-6}$ \\
+Average Correlation ($\bar{\rho}$)  & +0.808 & +3.1668 & (0.4576) & +6.92 & $4.50 \times 10^{-12}$ \\
+Effective Rank ($ER$)               & -0.761 & +0.0500 & (0.0187) & +2.68 & $7.40 \times 10^{-3}$ \\
+Diebold-Yilmaz Index ($DY$)         & +0.740 & -0.0133 & (0.0059) & -2.27 & $2.30 \times 10^{-2}$ \\
+\midrule
+\multicolumn{6}{l}{$R^2 = 67.77\% \qquad \text{Unexplained Linear Variance} = 32.23\% \qquad N = 4,346$} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+As shown in Table \ref{tab:benchmarks_h4}, standard benchmarks account for 67.77\% of the in-sample linear variation in $\mathrm{CEFI}_t$, while 32.23\% remains unexplained by this linear specification.
+
+\section{Robustness and External Theoretical Validation}
+\label{sec:robustness}
+
+\subsection{Concordance with the Exact Continuous Formulation of Liu et al. (2024)}
+Table \ref{tab:cross_framework} and Figure \ref{fig:cross_framework} compare $\mathrm{CEFI}_t$ against the exact continuous formulation $\Delta \mathcal{J}$ of \citet{liu2024exact}. The estimated index has a Pearson correlation of 0.837 and a Spearman rank correlation of 0.806 with $\Delta \mathcal{J}^{\text{Liu}}$, although the two formulations generally select different optimal macro dimensions due to their distinct intervention measures.
+
+\begin{table}[htbp]
+\centering
+\caption{Cross-Method Benchmarking Against Published Literature (1992--2026, 870 Rolling Slices)}
+\label{tab:cross_framework}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Theoretical Benchmark} & \textbf{Pearson } $\mathbf{\rho}$ & \textbf{Spearman } $\mathbf{\rho_S}$ & \textbf{Exact } $\mathbf{q^*}$ \textbf{Match} & $\mathbf{q^*}$ \textbf{Match (}$\pm 1$\textbf{)} \\
+\midrule
+Liu et al. (2024) Uniform $\Delta \mathcal{J}$ & 0.837 & 0.806 & 3.4\% & 5.1\% \\
+Liu et al. (PRE 2025) SVD & 0.832 & 0.764 & 75.4\% & \textbf{88.7\%} \\
+Framework B (Conditional Uncertainty Covariance) & 0.795 & 0.771 & 6.2\% & 9.1\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{reports/figures/figure4_theoretical_benchmarking.pdf}
+\caption{Cross-method benchmarking across 870 historical slices: (a) $\mathrm{CEFI}_t$ vs. exact $\Delta \mathcal{J}$ of \citet{liu2024exact}; (b) $\mathrm{CEFI}_t$ vs. analytical SVD emergence of \citet{liu2025singular}.}
+\label{fig:cross_framework}
+\end{figure}
+
+\subsection{Concordance with the Analytical SVD Emergence of Liu et al. (PRE 2025)}
+Comparing $\mathrm{CEFI}_t$ against the analytical singular value decomposition approach of \citet{liu2025singular} yields a Pearson correlation of 0.832 and an 88.7\% dimensional agreement within $\pm 1$ macro dimension across 870 historical dates. This provides independent evidence that the selected low-dimensional structure is not specific to the Stiefel gradient search procedure.
+
+\subsection{Cross-Universe Replication (FF49)}
+Replicating the full pipeline across all $q \in \{1, \dots, 48\}$ on the 49 Industry Portfolios ($p=49$) yields a mean $\mathrm{CEFI}$ of 1.0585 and a modal dimension of $q^* = 3$, with 71.72\% of historical windows exhibiting $q^* \le 4$. In matched null inference during COVID 2020, $\mathrm{CEFI}_{\text{obs}} = 1.6350 > Q_{95}(H_0^{\text{static}}) = 1.6243$ ($p = 0.0594$).
+
+\subsection{Sensitivity to Scale Parameter \texorpdfstring{$\kappa$}{kappa} and Window Size \texorpdfstring{$W$}{W}}
+Varying the intervention strength across $\kappa \in \{0.25, 0.5, 1.0, 2.0, 4.0\}$ preserves rank correlations ($\rho_S \ge 0.718$), modal $q^* \in \{2, 3\}$, and crisis significance ($\beta_{\text{Liq}} > 0, t \ge 2.92$). Increasing estimation windows to $W = 750$ and $W = 1000$ days yields rank correlations of $\rho_S = 0.726$ and $\rho_S = 0.593$, with peak cross-correlation occurring at a phase shift of $\ell = -90$ days ($\rho = 0.683$), reflecting mechanical rolling window smoothing.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Economic Interpretation of Financial Causal Emergence}
+A positive $\mathrm{CEFI}_t$ indicates that an optimal macroscopic coarse-graining of the financial system possesses a higher causal transition density than the disaggregated micro-level assets. In economic terms, when individual industries experience elevated idiosyncratic noise, a properly oriented lower-dimensional projection can eliminate mutually cancelling noise components while concentrating collective intertemporal momentum.
+
+\subsection{Disentangling Contemporaneous Co-Movement from Lagged Dynamical Structure}
+Our four-tier null hierarchy clarifies the distinction between static correlation and dynamic causal organization. In calm periods, elevated $\mathrm{CEFI}_t$ is consistent with contemporaneous correlation and own-lag persistence. In systemic liquidity crises (e.g., the 2008 GFC peak), $\mathrm{CEFI}_t$ significantly exceeds the static correlation benchmark ($p = 0.0170$), indicating the presence of structured intertemporal organization that cannot be explained by static covariance alone.
+
+\subsection{Inter-Crisis Episodes (2011--2013 Debt Ceiling and Sovereign Debt)}
+As shown in Figure \ref{fig:cefi_dynamics}, $\mathrm{CEFI}_t$ also displays secondary peaks during the 2011 U.S. sovereign debt downgrade and the European sovereign debt crisis. These peaks coincide with known macro-financial stress events. However, because matched-null inference was not conducted for every historical window, their interpretation as dynamic cross-sectoral organization remains descriptive.
+
+\subsection{Complementarity with Macroprudential Indicators}
+These results suggest that causal emergence may provide a complementary information-theoretic lens for monitoring changes in systemic market organization, capturing shifts in collective transition structure that supplement traditional static correlation and volatility indices.
+
+\section{Limitations}
+\label{sec:limitations}
+
+Several methodological limitations should be noted:
+\begin{enumerate}
+    \item \textbf{Linear Gaussian Transition Dynamics}: Micro-dynamics are modeled through a linear VAR(1) with Gaussian innovations. Non-linear spillover dynamics, volatility clustering, and heavy-tailed co-jumps are not explicitly parameterized in the transition operator.
+    \item \textbf{Reduced-Form Representation}: The transition matrix $\mathbf{A}$ is estimated in reduced form. Interventions represent counterfactual Gaussian perturbations under the fitted dynamical model and should not be interpreted as structural policy shocks.
+    \item \textbf{Aggregation Level}: The empirical analysis relies on industry portfolios rather than individual financial institutions, reflecting cross-sectoral market organization rather than interbank counterparty networks.
+    \item \textbf{Sample Size of Historical Crises}: The number of major systemic dislocations in modern market history is inherently limited. Event-study inference should be interpreted as within-sample regime evidence across historical episodes rather than asymptotic identification of crisis taxonomies.
+    \item \textbf{Intervention Family Dependence}: Although empirical conclusions remain stable across the evaluated $\kappa$ range, $\mathrm{CEFI}_t$ remains conditional on the chosen family of isotropic Gaussian interventions.
+\end{enumerate}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper has developed and evaluated continuous-state Causal Emergence as an empirical measure of systemic financial risk. By formulating scale-invariant Effective Information on Stiefel manifolds and benchmarking against a hierarchy of matched surrogate null models ($B=999$), we find that causal emergence varies across market states and historical episodes. While normal market periods are consistent with univariate persistence and contemporaneous covariance, systemic liquidity and contagion crises exhibit elevated macroscopic organization and a concentration of causal effective dimensionality toward low-dimensional macro-factors ($q^* \in \{2, 3\}$). These results indicate that continuous causal emergence provides an informative framework for monitoring collective market organization during financial distress.
+
+\appendix
+
+\section{Benchmark Construction and Definitions}
+\label{app:benchmarks}
+To ensure reproducibility, conventional systemic risk proxies evaluated in Section 5.4 are constructed over each rolling window $X_{t-W+1:t}$ as follows:
+\begin{enumerate}
+    \item \textbf{Realized Volatility ($RV_t$)}: Annualized standard deviation of the equal-weighted portfolio return series, $RV_t = \sqrt{252} \cdot \operatorname{std}(\bar{x}_t)$.
+    \item \textbf{Average Correlation ($\bar{\rho}_t$)}: Mean off-diagonal element of the $p \times p$ sample correlation matrix $\mathbf{R}_t$: $\bar{\rho}_t = \frac{2}{p(p-1)} \sum_{i < j} R_{ij,t}$.
+    \item \textbf{Effective Rank ($ER_t$)}: Spectral entropy exponentiation of normalized covariance eigenvalues \citep{roy2007effective}:
+    \begin{equation}
+    ER_t = \exp\left( -\sum_{i=1}^p p_i \ln p_i \right), \qquad p_i = \frac{\lambda_i(\boldsymbol{\Sigma}_{x,t})}{\sum_{j=1}^p \lambda_j(\boldsymbol{\Sigma}_{x,t})}
+    \end{equation}
+    \item \textbf{Diebold-Yilmaz Connectedness Index ($DY_t$)}: Total volatility spillover index derived from generalized forecast error variance decompositions of a VAR(1) with forecast horizon $H = 10$ days \citep{diebold2012better}.
+\end{enumerate}
+
+\section{Optimizer Convergence and Multistart Diagnostics}
+\label{app:optimizer}
+To verify the numerical stability of Riemannian gradient ascent on $\mathcal{V}_q(\mathbb{R}^p)$, we evaluated convergence across gradient iterations $\{35, 75, 150\}$ and multistart restarts $\{4, 10, 25\}$ across the three primary benchmark windows. Across all configurations, the identified optimal causal effective dimension was identical ($q^* = 2$). The relative objective gap between 75 iterations (10 restarts) and 150 iterations (25 restarts) was under 0.8\%, confirming that the default configuration captures the dominant local extrema.
+
+\section*{Declaration of Competing Interests}
+The author declares that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Data and Code Availability}
+All datasets used in this study (Kenneth French Industry Portfolios) are publicly available. Replication code and estimation routines will be deposited in an open-access repository upon publication.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+During the preparation of this work, the author used OpenAI ChatGPT and Google Gemini to improve the language and readability of the manuscript. After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the published article.
+
+
+\bibliographystyle{elsarticle-harv}
+\begin{thebibliography}{25}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+
+\bibitem[Absil et~al., 2008]{absil2008optimization}
+Absil, P.-A., Mahony, R., Sepulchre, R., 2008.
+\newblock Optimization Algorithms on Matrix Manifolds.
+\newblock Princeton University Press, Princeton, NJ.
+
+\bibitem[Acharya et~al., 2017]{acharya2017measuring}
+Acharya, V.~V., Pedersen, L.~H., Philippon, T., Richardson, M., 2017.
+\newblock Measuring systemic risk.
+\newblock \emph{Review of Financial Studies} 30(1), 2--47.
+
+\bibitem[Adrian and Brunnermeier, 2016]{adrian2016covar}
+Adrian, T., Brunnermeier, M.~K., 2016.
+\newblock {CoVaR}.
+\newblock \emph{American Economic Review} 106(7), 1705--1741.
+
+\bibitem[Billio et~al., 2012]{billio2012econometric}
+Billio, M., Getmansky, M., Lo, A.~W., Pelizzon, L., 2012.
+\newblock Econometric measures of connectedness and systemic risk in the finance and insurance sectors.
+\newblock \emph{Journal of Financial Economics} 104(3), 535--559.
+
+\bibitem[Brownlees and Engle, 2017]{brownlees2017srisk}
+Brownlees, C., Engle, R.~F., 2017.
+\newblock {SRISK}: A conditional capital shortfall measure of systemic risk.
+\newblock \emph{Review of Financial Studies} 30(1), 48--79.
+
+\bibitem[Diebold and Y{\i}lmaz, 2012]{diebold2012better}
+Diebold, F.~X., Y{\i}lmaz, K., 2012.
+\newblock Better to give than to receive: Predictive directional measurement of volatility spillovers.
+\newblock \emph{International Journal of Forecasting} 28(1), 57--66.
+
+\bibitem[Diebold and Y{\i}lmaz, 2014]{diebold2014network}
+Diebold, F.~X., Y{\i}lmaz, K., 2014.
+\newblock On the network topology of variance decompositions: Measuring the connectedness of financial firms.
+\newblock \emph{Journal of Econometrics} 182(1), 119--134.
+
+\bibitem[Dimpfl and Peter, 2013]{dimpfl2013using}
+Dimpfl, T., Peter, F.~J., 2013.
+\newblock Using transfer entropy to measure dynamic information flows between markets.
+\newblock \emph{Journal of International Financial Markets, Institutions and Money} 27, 273--294.
+
+\bibitem[Edelman et~al., 1998]{edelman1998geometry}
+Edelman, A., Arias, T.~A., Smith, S.~T., 1998.
+\newblock The geometry of algorithms with orthogonality constraints.
+\newblock \emph{SIAM Journal on Matrix Analysis and Applications} 20(2), 303--353.
+
+\bibitem[Hoel, 2017]{hoel2017when}
+Hoel, E.~P., 2017.
+\newblock When the map is better than the territory.
+\newblock \emph{Entropy} 19(5), 188.
+
+\bibitem[Hoel et~al., 2013]{hoel2013quantifying}
+Hoel, E.~P., Albantakis, L., Tononi, G., 2013.
+\newblock Quantifying causal emergence shows that macro can beat micro.
+\newblock \emph{Proceedings of the National Academy of Sciences} 110(49), 19790--19795.
+
+\bibitem[Klein and Hoel, 2020]{klein2020emergence}
+Klein, B., Hoel, E., 2020.
+\newblock The emergence of informative higher scales in complex networks.
+\newblock \emph{Complexity} 2020, 8932526.
+
+\bibitem[Kritzman et~al., 2011]{kritzman2011principal}
+Kritzman, M., Li, Y., Page, S., Rigobon, R., 2011.
+\newblock Principal components as a measure of systemic risk.
+\newblock \emph{Journal of Portfolio Management} 37(4), 112--126.
+
+\bibitem[Ledoit and Wolf, 2004]{ledoit2004well}
+Ledoit, O., Wolf, M., 2004.
+\newblock A well-conditioned estimator for large-dimensional covariance matrices.
+\newblock \emph{Journal of Multivariate Analysis} 88(2), 365--411.
+
+\bibitem[Liu et~al., 2024]{liu2024exact}
+Liu, K., Yuan, B., Zhang, J., 2024.
+\newblock An exact theory of causal emergence for linear stochastic iteration systems.
+\newblock \emph{Entropy} 26(8), 618.
+
+\bibitem[Liu et~al., 2025]{liu2025singular}
+Liu, K., Pan, L., Wang, Z., Yang, M., Yuan, B., Zhang, J., 2025.
+\newblock Singular-value-decomposition-based causal emergence for {G}aussian iterative systems.
+\newblock \emph{Physical Review E} 112, 054225.
+
+\bibitem[Newey and West, 1987]{newey1987hypothesis}
+Newey, W.~K., West, K.~D., 1987.
+\newblock A simple, positive semi-definite, heteroskedasticity and autocorrelation consistent covariance matrix.
+\newblock \emph{Econometrica} 55(3), 703--708.
+
+\bibitem[Politis and Romano, 1994]{politis1994stationary}
+Politis, D.~N., Romano, J.~P., 1994.
+\newblock The stationary bootstrap.
+\newblock \emph{Journal of the American Statistical Association} 89(428), 1303--1313.
+
+\bibitem[Rosas et~al., 2020]{rosas2020reconciling}
+Rosas, F.~E., Mediano, P.~A., Jensen, H.~J., Seth, A.~K., Barrett, A.~B., Carhart-Harris, R.~L., Bor, D., 2020.
+\newblock Reconciling emergences: An information-theoretic approach to identify causal emergence in multivariate data.
+\newblock \emph{PLoS Computational Biology} 16(12), e1008579.
+
+\bibitem[Roy and Vetterli, 2007]{roy2007effective}
+Roy, O., Vetterli, M., 2007.
+\newblock The effective rank: A measure of effective dimensionality.
+\newblock In: \emph{15th European Signal Processing Conference (EUSIPCO 2007)}, pp. 606--610.
+
+\bibitem[Schreiber, 2000]{schreiber2000measuring}
+Schreiber, T., 2000.
+\newblock Measuring information transfer.
+\newblock \emph{Physical Review Letters} 85(2), 461--464.
+
+\bibitem[Yang et~al., 2025]{yang2025finding}
+Yang, M., Wang, Z., Liu, K., Rong, Y., Yuan, B., Zhang, J., 2025.
+\newblock Finding emergence in data by maximizing effective information.
+\newblock \emph{National Science Review} 12(1), nwae279.
+
+\end{thebibliography}
+
+\end{document}

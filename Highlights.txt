@@ -1,5 +1,5 @@
-- Scale-invariant continuous causal emergence operationalized for financial returns.
-- Matched null hierarchy separates static co-movement from lagged organization.
-- GFC peak exhibits distinct cross-lag dynamical coupling beyond static nulls.
-- Liquidity stress concentrates causal effective dimension to low macro factors.
-- Cross-universe robustness confirmed across 49 industry portfolio cross-section.
+- Scale-invariant causal emergence operationalized for industry portfolios.
+- Matched null models separate static co-movement from cross-lag coupling.
+- CEFI exhibits descriptive variation across historical market stress regimes.
+- Under baseline interventions, causal effective dimension is persistently low.
+- Gaussian CEFI exhibits 0.82 concordance with analytical SVD emergence.

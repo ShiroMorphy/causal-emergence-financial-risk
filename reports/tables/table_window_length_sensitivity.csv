@@ -1,0 +1,4 @@
+Window_Length,Mean_CEFI,Spearman_rho_vs_Baseline,Optimal_Phase_Lag_Steps,Optimal_Phase_Lag_Trading_Days,Lagged_Corr
+W = 500 trading days (Baseline),0.23751384138305123,1.0,0,0,1.0
+W = 750 trading days,0.1675675626971959,0.818640996401148,-5,-10,0.7933184236137955
+W = 1000 trading days,0.12495663438059329,0.6896446352589471,-70,-140,0.6798231830149318

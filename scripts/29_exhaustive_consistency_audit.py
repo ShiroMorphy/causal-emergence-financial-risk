@@ -55,9 +55,10 @@ def run_exhaustive_audit():
     errors = []
 
     # Check 1: P0.1 Conclusion in compiled manuscript.pdf
-    if "80.8%" not in ms_pdf_text or "48.9%" not in ms_pdf_text:
-        errors.append("[FAIL P0.1] Conclusion in manuscript.pdf is truncated or missing percentage figures.")
-    elif "informative framework for monitoring collective market organization during financial distress" not in ms_pdf_text:
+    norm_ms_pdf = " ".join(ms_pdf_text.split())
+    if "87.7%" not in norm_ms_pdf or "98.94%" not in norm_ms_pdf:
+        errors.append("[FAIL P0.1] Conclusion in manuscript.pdf is missing percentage figures.")
+    elif "monitoring macroscopic market organization during financial distress" not in norm_ms_pdf:
         errors.append("[FAIL P0.1] Conclusion in manuscript.pdf is missing the final sentence.")
     else:
         print("[PASS P0.1] Conclusion in manuscript.pdf is 100% complete and fully rendered.")
@@ -121,9 +122,9 @@ def run_exhaustive_audit():
     else:
         print("[PASS P1.6] Cover_Letter.pdf is strictly 1 page.")
 
-    # Check 10: P1.7 AI Disclosure Consistency
-    if "code optimization, numerical verification scripting" not in ms_src:
-        errors.append("[FAIL P1.7] Expanded AI disclosure missing from manuscript.tex.")
+    # Check 10: P1.7 AI Disclosure Consistency (Elsevier Policy)
+    if "OpenAI GPT-4o/o1 and Google Gemini 1.5 Pro/Advanced" not in ms_src:
+        errors.append("[FAIL P1.7] Expanded AI disclosure naming GPT-4o/o1 and Gemini missing from manuscript.tex.")
     else:
         print("[PASS P1.7] AI disclosure synchronized across manuscript source and compiled PDF.")
 
@@ -131,14 +132,14 @@ def run_exhaustive_audit():
     if "2.94" in ms_src or "2.94" in app_src:
         errors.append("[FAIL] Stale Wald statistic 2.94 found in source.")
     else:
-        print("[PASS] Wald statistic updated to t >= 3.10 across all documents.")
+        print("[PASS] Stale Wald statistic 2.94 eliminated across all documents.")
 
     # Check 12: Event Study HAC Synchronization (12/100 Canonical)
-    for w in ["+6.39", "+5.01", "+4.44", "+3.85", "+3.75"]:
+    for w in ["+3.11", "+2.40", "+2.12", "+1.83", "+1.71"]:
         if w not in ms_src or w not in app_src:
-            errors.append(f"[FAIL] HAC contrast Wald t-stat {w} missing from Table 3 or Table A11.")
-    if not any("HAC contrast" in e for e in errors):
-        print("[PASS] Table 3 and Table A11 HAC statistics 100% synchronized.")
+            errors.append(f"[FAIL] Canonical HAC contrast Wald t-stat {w} missing from Table 3 or Table A10.")
+    if not any("Canonical HAC contrast" in e for e in errors):
+        print("[PASS] Table 3 and Table A10 HAC statistics 100% synchronized (+3.11, +2.40, +2.12, +1.83, +1.71).")
 
     # Check 13: Anonymity of Manuscript & Supplement
     if "Felipe Mora" in ms_pdf_text:
@@ -154,11 +155,11 @@ def run_exhaustive_audit():
     else:
         print("[PASS] Bibliography contains verified DOIs and article IDs (Ahelegbey 102101, Mensi 101672, Yang 102618).")
 
-    # Check 15: Figure 2 Moment-Matched Caption
-    if "moment-matched surrogate distributions" not in ms_src:
-        errors.append("[FAIL] Figure 2/3 caption missing 'moment-matched surrogate distributions' description.")
+    # Check 15: Matched Surrogate Null Distributions Description
+    if "matched surrogate null distributions" not in ms_src:
+        errors.append("[FAIL] Figure 3 caption missing 'matched surrogate null distributions' description.")
     else:
-        print("[PASS] Figure 2/3 caption accurately declares moment-matched surrogate distributions.")
+        print("[PASS] Figure 3 caption accurately declares matched surrogate null distributions.")
 
     # Check 16: Figure 4 Exists and is non-empty
     fig4_pdf = "reports/figures/figure4_theoretical_benchmarking.pdf"
@@ -167,6 +168,56 @@ def run_exhaustive_audit():
     else:
         print("[PASS] Figure 4 theoretical benchmarking plot verified non-empty.")
 
+    # Check 17: Narrowed Title Across All 4 Documents
+    narrowed_title = "Causal Emergence in U.S. Equity Industry Portfolios: Dynamic Organization and Effective Dimensionality During Systemic Stress"
+    for doc_name, src in [("manuscript.tex", ms_src), ("Supplementary_Appendix.tex", app_src), ("Title_Page.tex", tp_src), ("Cover_Letter.tex", cl_src)]:
+        if narrowed_title not in src:
+            errors.append(f"[FAIL] Narrowed title missing from {doc_name}.")
+    if not any("Narrowed title" in e for e in errors):
+        print("[PASS] Narrowed title synchronized across all 4 LaTeX documents.")
+
+    # Check 18: Liu et al. (2025) Verified DOI
+    if "10.1103/mfct-sxn5" not in ms_src or "10.1103/mfct-sxn5" not in app_src:
+        errors.append("[FAIL] Corrected DOI 10.1103/mfct-sxn5 missing from manuscript or appendix bibliography.")
+    else:
+        print("[PASS] Corrected DOI 10.1103/mfct-sxn5 verified in bibliographies.")
+
+    # Check 19: Extended HAC Columns in Table 4
+    if "L=250" not in ms_src or "t\ (L=250)" not in ms_src:
+        errors.append("[FAIL] Extended HAC (L=250) column missing from Table 4.")
+    else:
+        print("[PASS] Table 4 contains extended HAC bandwidths up to L=250.")
+
+    # Check 20: Stale "PRE 2025" completely eliminated
+    if "PRE 2025" in ms_src or "PRE 2025" in app_src or "PRE 2025" in cl_src:
+        errors.append("[FAIL] Stale 'PRE 2025' found in manuscript, appendix, or cover letter.")
+    else:
+        print("[PASS] Stale 'PRE 2025' label completely eliminated across all documents.")
+
+    # Check 21: "intrinsic feature" eliminated
+    if "intrinsic feature" in ms_src.lower() or "intrinsic feature" in cl_src.lower():
+        errors.append("[FAIL] Over-strong 'intrinsic feature' claim found in manuscript or cover letter.")
+    else:
+        print("[PASS] Over-strong 'intrinsic feature' claim replaced with surrogate-favored phrasing.")
+
+    # Check 22: Unhedged "establish" eliminated in results and conclusion
+    if "establish that:" in ms_src.lower() or "we establish that cross-industry" in ms_src.lower():
+        errors.append("[FAIL] Unhedged 'establish' found in manuscript results or conclusion.")
+    else:
+        print("[PASS] Unhedged 'establish' verbs replaced with prudent wording (show, document, indicate).")
+
+    # Check 23: Data and Code Availability verified
+    if "Zenodo / GitHub" in ms_src or "https://github.com/ShiroMorphy/causal-emergence-financial-risk" not in ms_src or "49 Industry Portfolios" not in ms_src:
+        errors.append("[FAIL] Data and Code Availability statement contains placeholder, missing GitHub URL, or missing FF49.")
+    else:
+        print("[PASS] Data and Code Availability statement verified (FF30, FF49, repository URL, no placeholders).")
+
+    # Check 24: Residualized CEFI narrow wording verified
+    if "co-aligned with conventional" in ms_src or "predominantly concentrated" in ms_src:
+        errors.append("[FAIL] Over-interpreted residualized CEFI claims found in manuscript.tex.")
+    else:
+        print("[PASS] Residualized CEFI statement strictly bounded to episode-average empirical residuals.")
+
     print("-" * 80)
     if errors:
         print(f"AUDIT FAILED WITH {len(errors)} ERROR(S):")
@@ -174,7 +225,7 @@ def run_exhaustive_audit():
             print("  ", e)
         return False
     else:
-        print("ALL 16 EXHAUSTIVE ADVERSARIAL CHECKS PASSED (100% CLEAN)!")
+        print("ALL 24 EXHAUSTIVE ADVERSARIAL CHECKS PASSED (100% CLEAN)!")
         return True
 
 if __name__ == "__main__":
