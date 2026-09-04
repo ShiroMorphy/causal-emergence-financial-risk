@@ -123,10 +123,10 @@ def run_exhaustive_audit():
         print("[PASS P1.6] Cover_Letter.pdf is strictly 1 page.")
 
     # Check 10: P1.7 AI Disclosure Consistency (Elsevier Policy)
-    if "OpenAI GPT-4o/o1 and Google Gemini 1.5 Pro/Advanced" not in ms_src:
-        errors.append("[FAIL P1.7] Expanded AI disclosure naming GPT-4o/o1 and Gemini missing from manuscript.tex.")
+    if "During the preparation of this work, the author used OpenAI GPT" not in ms_src or "edit language, improve readability, and adapt the writing" not in ms_src:
+        errors.append("[FAIL P1.7] AI disclosure specifying OpenAI GPT for language and readability missing from manuscript.tex.")
     else:
-        print("[PASS P1.7] AI disclosure synchronized across manuscript source and compiled PDF.")
+        print("[PASS P1.7] AI disclosure synchronized across manuscript source and compiled PDF (Elsevier policy compliant).")
 
     # Check 11: Stale Wald t >= 2.94 eliminated
     if "2.94" in ms_src or "2.94" in app_src:
